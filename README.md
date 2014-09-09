@@ -1,4 +1,4 @@
-## MobileDB: a lightweight, fast and embeddable database engine 
+## MobileDB - a lightweight, fast and embeddable database engine 
 
 You like **EntityFramework's** API and the way of accessing tables and save data? You asked your self why there is no simple json file database to use in small projects, apps, etc where you don't need a full database engine? **Then try out MobileDB**
 
