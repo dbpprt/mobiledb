@@ -1,0 +1,39 @@
+﻿
+Microsoft Visual Studio Solution File, Format Version 12.00
+# Visual Studio 2013
+VisualStudioVersion = 12.0.30723.0
+MinimumVisualStudioVersion = 10.0.40219.1
+Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "MobileDB.Core", "MobileDB.Core\MobileDB.Core.csproj", "{500D46BD-FE3A-4402-9F8E-D1211ADB5DD5}"
+EndProject
+Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "MobileDB", "MobileDB\MobileDB.csproj", "{50713C1E-1864-434F-8C06-77293B40F036}"
+EndProject
+Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "MobileDB.Test", "MobileDB.Tests\MobileDB.Test.csproj", "{48B1B581-A05E-4C26-BF95-A8266FE4F3EA}"
+EndProject
+Project("{2150E333-8FDC-42A3-9474-1A3956D46DE8}") = "Solution Items", "Solution Items", "{3C11C71E-A1E6-481C-AA59-E2D14644C8FE}"
+	ProjectSection(SolutionItems) = preProject
+		SharedAssemblyInfo.cs = SharedAssemblyInfo.cs
+	EndProjectSection
+EndProject
+Global
+	GlobalSection(SolutionConfigurationPlatforms) = preSolution
+		Debug|Any CPU = Debug|Any CPU
+		Release|Any CPU = Release|Any CPU
+	EndGlobalSection
+	GlobalSection(ProjectConfigurationPlatforms) = postSolution
+		{500D46BD-FE3A-4402-9F8E-D1211ADB5DD5}.Debug|Any CPU.ActiveCfg = Debug|Any CPU
+		{500D46BD-FE3A-4402-9F8E-D1211ADB5DD5}.Debug|Any CPU.Build.0 = Debug|Any CPU
+		{500D46BD-FE3A-4402-9F8E-D1211ADB5DD5}.Release|Any CPU.ActiveCfg = Release|Any CPU
+		{500D46BD-FE3A-4402-9F8E-D1211ADB5DD5}.Release|Any CPU.Build.0 = Release|Any CPU
+		{50713C1E-1864-434F-8C06-77293B40F036}.Debug|Any CPU.ActiveCfg = Debug|Any CPU
+		{50713C1E-1864-434F-8C06-77293B40F036}.Debug|Any CPU.Build.0 = Debug|Any CPU
+		{50713C1E-1864-434F-8C06-77293B40F036}.Release|Any CPU.ActiveCfg = Release|Any CPU
+		{50713C1E-1864-434F-8C06-77293B40F036}.Release|Any CPU.Build.0 = Release|Any CPU
+		{48B1B581-A05E-4C26-BF95-A8266FE4F3EA}.Debug|Any CPU.ActiveCfg = Debug|Any CPU
+		{48B1B581-A05E-4C26-BF95-A8266FE4F3EA}.Debug|Any CPU.Build.0 = Debug|Any CPU
+		{48B1B581-A05E-4C26-BF95-A8266FE4F3EA}.Release|Any CPU.ActiveCfg = Release|Any CPU
+		{48B1B581-A05E-4C26-BF95-A8266FE4F3EA}.Release|Any CPU.Build.0 = Release|Any CPU
+	EndGlobalSection
+	GlobalSection(SolutionProperties) = preSolution
+		HideSolutionNode = FALSE
+	EndGlobalSection
+EndGlobal
