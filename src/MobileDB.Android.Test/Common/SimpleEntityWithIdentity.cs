@@ -22,14 +22,16 @@
 // SOFTWARE.
 #endregion
 
-using System.Threading.Tasks;
+using System;
+using MobileDB.Common.Attributes;
 
-namespace MobileDB.Stores.Contracts
+namespace MobileDB.Android.Test.Common
 {
-    public interface IStatefulStore
+    public class SimpleEntityWithIdentity
     {
-        void Release();
+        [Identity]
+        public Guid Id { get; set; }
 
-        Task EnsureInitialized();
+        public string Value { get; set; }
     }
 }

@@ -23,6 +23,7 @@
 #endregion
 
 using System.Linq;
+using System.Threading.Tasks;
 
 namespace MobileDB.Contracts
 {
@@ -34,7 +35,7 @@ namespace MobileDB.Contracts
 
         void RemoveById(object key);
 
-        TEntity FindById(object key);
+        Task<TEntity> FindById(object key);
 
         void Update(TEntity entity);
 
@@ -42,6 +43,6 @@ namespace MobileDB.Contracts
 
         void Release();
 
-        int Count();
+        Task<int> Count();
     }
 }

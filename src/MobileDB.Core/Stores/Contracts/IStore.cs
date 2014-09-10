@@ -32,12 +32,10 @@ namespace MobileDB.Stores.Contracts
     {
         FileSystemPath Path { get; }
 
-        int SaveChanges(ChangeSet changeSet);
-
         Task<int> SaveChangesAsync(ChangeSet changeSet);
 
-        int Count();
+        Task<int> Count();
 
-        object FindById(object key);
+        Task<object> FindById(object key);
     }
 }

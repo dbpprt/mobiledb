@@ -22,14 +22,18 @@
 // SOFTWARE.
 #endregion
 
-using System.Threading.Tasks;
+using System.Reflection;
 
-namespace MobileDB.Stores.Contracts
+namespace MobileDB.Android.Test.Common
 {
-    public interface IStatefulStore
+    public static class ReflectionHelper
     {
-        void Release();
-
-        Task EnsureInitialized();
+        public static void ClearInternalContextCaches()
+        {
+            var type = typeof (DbContext);
+            var cacheField = type.GetField("CachedContextConfigurations", BindingFlags.NonPublic | BindingFlags.Static);
+            var cache = cacheField.GetValue(null);
+            cache.GetType().GetMethod("Clear").Invoke(cache, null);
+        }
     }
 }

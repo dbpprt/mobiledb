@@ -1,7 +1,7 @@
 ﻿
 Microsoft Visual Studio Solution File, Format Version 12.00
 # Visual Studio 2013
-VisualStudioVersion = 12.0.30723.0
+VisualStudioVersion = 12.0.30501.0
 MinimumVisualStudioVersion = 10.0.40219.1
 Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "MobileDB.Core", "MobileDB.Core\MobileDB.Core.csproj", "{500D46BD-FE3A-4402-9F8E-D1211ADB5DD5}"
 EndProject
@@ -13,6 +13,10 @@ Project("{2150E333-8FDC-42A3-9474-1A3956D46DE8}") = "Solution Items", "Solution 
 	ProjectSection(SolutionItems) = preProject
 		SharedAssemblyInfo.cs = SharedAssemblyInfo.cs
 	EndProjectSection
+EndProject
+Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "MobileDB.Android.Test", "MobileDB.Android.Test\MobileDB.Android.Test.csproj", "{5785BC23-152E-437A-B1E7-36BD1FC33714}"
+EndProject
+Project("{2150E333-8FDC-42A3-9474-1A3956D46DE8}") = "tests", "tests", "{B32F94A8-3807-4CD0-A40D-EDD0F1133839}"
 EndProject
 Global
 	GlobalSection(SolutionConfigurationPlatforms) = preSolution
@@ -32,8 +36,18 @@ Global
 		{48B1B581-A05E-4C26-BF95-A8266FE4F3EA}.Debug|Any CPU.Build.0 = Debug|Any CPU
 		{48B1B581-A05E-4C26-BF95-A8266FE4F3EA}.Release|Any CPU.ActiveCfg = Release|Any CPU
 		{48B1B581-A05E-4C26-BF95-A8266FE4F3EA}.Release|Any CPU.Build.0 = Release|Any CPU
+		{5785BC23-152E-437A-B1E7-36BD1FC33714}.Debug|Any CPU.ActiveCfg = Debug|Any CPU
+		{5785BC23-152E-437A-B1E7-36BD1FC33714}.Debug|Any CPU.Build.0 = Debug|Any CPU
+		{5785BC23-152E-437A-B1E7-36BD1FC33714}.Debug|Any CPU.Deploy.0 = Debug|Any CPU
+		{5785BC23-152E-437A-B1E7-36BD1FC33714}.Release|Any CPU.ActiveCfg = Release|Any CPU
+		{5785BC23-152E-437A-B1E7-36BD1FC33714}.Release|Any CPU.Build.0 = Release|Any CPU
+		{5785BC23-152E-437A-B1E7-36BD1FC33714}.Release|Any CPU.Deploy.0 = Release|Any CPU
 	EndGlobalSection
 	GlobalSection(SolutionProperties) = preSolution
 		HideSolutionNode = FALSE
+	EndGlobalSection
+	GlobalSection(NestedProjects) = preSolution
+		{48B1B581-A05E-4C26-BF95-A8266FE4F3EA} = {B32F94A8-3807-4CD0-A40D-EDD0F1133839}
+		{5785BC23-152E-437A-B1E7-36BD1FC33714} = {B32F94A8-3807-4CD0-A40D-EDD0F1133839}
 	EndGlobalSection
 EndGlobal

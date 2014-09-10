@@ -85,16 +85,16 @@ namespace MobileDB
 
         public IFileSystem FileSystem { get; private set; }
 
-        public int SaveChanges()
-        {
-            var changedEntities =
-                (from trackedChangeSet in _changeTracker
-                    let configuration = trackedChangeSet.Key
-                    let changeset = trackedChangeSet.Value
-                    select configuration.EntityStore.SaveChanges(changeset)).Sum();
+        //public int SaveChanges()
+        //{
+        //    var changedEntities =
+        //        (from trackedChangeSet in _changeTracker
+        //            let configuration = trackedChangeSet.Key
+        //            let changeset = trackedChangeSet.Value
+        //            select configuration.EntityStore.SaveChanges(changeset)).Sum();
 
-            return changedEntities;
-        }
+        //    return changedEntities;
+        //}
 
         public async Task<int> SaveChangesAsync()
         {

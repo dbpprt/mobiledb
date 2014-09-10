@@ -26,6 +26,7 @@ using System;
 using System.Collections.Generic;
 using System.IO;
 using System.Linq;
+using System.Threading;
 using System.Threading.Tasks;
 using MobileDB.Common;
 using MobileDB.Common.Utilities;
@@ -33,7 +34,6 @@ using MobileDB.FileSystem;
 using MobileDB.FileSystem.Contracts;
 using MobileDB.Stores.Contracts;
 using Newtonsoft.Json;
-using Nito.AsyncEx;
 
 namespace MobileDB.Stores.Json
 {
@@ -43,7 +43,7 @@ namespace MobileDB.Stores.Json
 
         private readonly SimpleListSerializer _listSerializer;
 
-        private readonly AsyncReaderWriterLock _lock;
+        private readonly ReaderWriterLockSlim _lock;
         private readonly FileSystemPath _path;
         private readonly JsonSerializer _serializer;
         private Dictionary<object, Tuple<object, MetadataEntity>> _entities;
@@ -60,7 +60,7 @@ namespace MobileDB.Stores.Json
             _entities = new Dictionary<object, Tuple<object, MetadataEntity>>();
             _listSerializer = new SimpleListSerializer();
             _serializer = JsonSerializer.CreateDefault();
-            _lock = new AsyncReaderWriterLock();
+            _lock = new ReaderWriterLockSlim();
             _initialized = false;
 
             _path = FileSystemPath.Root.AppendFile(
@@ -74,9 +74,9 @@ namespace MobileDB.Stores.Json
 
         public IQueryable<T> AsQueryable<T>()
         {
-            EnsureInitialized();
+            //EnsureInitialized();
 
-            using (_lock.ReaderLock())
+            using (_lock.ReadLock())
             {
                 return _entities.Values
                     .Select(_ => _.Item1)
@@ -88,26 +88,26 @@ namespace MobileDB.Stores.Json
 
         public void Release()
         {
-            using (_lock.WriterLock())
+            using (_lock.WriteLock())
             {
                 _initialized = false;
                 _entities = new Dictionary<object, Tuple<object, MetadataEntity>>();
             }
         }
 
-        public void EnsureInitialized()
+        public async Task EnsureInitialized()
         {
             if (_initialized) return;
 
-            using (_lock.WriterLock())
+            using (_lock.ReadLock())
             {
-                if (!FileSystem.Exists(Path))
+                if (!await FileSystem.Exists(Path))
                 {
                     _initialized = true;
                     return;
                 }
 
-                using (var stream = FileSystem.OpenFile(Path, DesiredFileAccess.Read))
+                using (var stream = await FileSystem.OpenFile(Path, DesiredFileAccess.Read))
                 using (var instream = new StreamReader(stream))
                 {
                     var json = "[" + instream.ReadToEnd().Replace(Environment.NewLine, ",") + "]";
@@ -125,11 +125,11 @@ namespace MobileDB.Stores.Json
             }
         }
 
-        public override int SaveChanges(ChangeSet changeSet)
+        public override async Task<int> SaveChangesAsync(ChangeSet changeSet)
         {
-            EnsureInitialized();
+            await EnsureInitialized();
 
-            using (_lock.WriterLock())
+            using (_lock.WriteLock())
             {
                 var affectedEntities = 0;
 
@@ -148,7 +148,7 @@ namespace MobileDB.Stores.Json
                     .Select(_ => _.Item2)
                     .ToList();
 
-                using (var stream = FileSystem.CreateFile(Path))
+                using (var stream = await FileSystem.CreateFile(Path))
                 using (var outstream = new StreamWriter(stream))
                 {
                     var writer = new JsonTextWriter(outstream);
@@ -183,28 +183,21 @@ namespace MobileDB.Stores.Json
             }
         }
 
-        public override async Task<int> SaveChangesAsync(ChangeSet changeSet)
+        public override async Task<int> Count()
         {
-            using (await _lock.WriterLockAsync())
-            {
-            }
+            await AwaitExtensions.SwitchOffMainThreadAsync(default(CancellationToken));
 
-            return 0;
-        }
-
-        public override int Count()
-        {
-            using (_lock.ReaderLock())
+            using (_lock.ReadLock())
             {
                 return _entities.Count;
             }
         }
 
-        public override object FindById(object key)
+        public override async Task<object> FindById(object key)
         {
-            EnsureInitialized();
+            await EnsureInitialized();
 
-            using (_lock.ReaderLock())
+            using (_lock.ReadLock())
             {
                 Tuple<object, MetadataEntity> entity;
                 _entities.TryGetValue(key, out entity);

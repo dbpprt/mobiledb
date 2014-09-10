@@ -24,18 +24,16 @@
 
 using System;
 using System.IO;
-using System.Linq;
-using System.Threading.Tasks;
+using MobileDB.Android.Test.Common;
 using MobileDB.Common.Factory;
-using MobileDB.Tests.Common;
 using Xunit;
 
-namespace MobileDB.Tests
+namespace MobileDB.Android.Test
 {
     public class JsonStoreTests
     {
         [Fact]
-        public async Task Json_Save_Some_Items()
+        public void Json_Save_Some_Items()
         {
             var context = ContextFactory.Create<JsonContextWithSimpleIdentity>()
                 .WithPhysicalFilesystem("C:\\Development\\database\\")
@@ -51,11 +49,11 @@ namespace MobileDB.Tests
                 Value = "yay"
             });
 
-            await context.SaveChangesAsync();
+            context.SaveChanges();
         }
 
         [Fact]
-        public async Task Json_Save_Item_And_Reload_From_Filesystem()
+        public void Json_Save_Item_And_Reload_From_Filesystem()
         {
             var path = "C:\\Development\\database\\" + Guid.NewGuid() + "\\";
             if (!Directory.Exists(path))
@@ -77,7 +75,7 @@ namespace MobileDB.Tests
                 Value = "yay"
             });
 
-            await context.SaveChangesAsync();
+            context.SaveChanges();
 
             ReflectionHelper.ClearInternalContextCaches();
 
@@ -95,7 +93,7 @@ namespace MobileDB.Tests
         }
 
         [Fact]
-        public async Task Json_Save_Alot_Items_And_Query_Them()
+        public void Json_Save_Alot_Items_And_Query_Them()
         {
             var path = "C:\\Development\\database\\" + Guid.NewGuid() + "\\";
             var count = 100000;
@@ -122,7 +120,7 @@ namespace MobileDB.Tests
                 });
             }
 
-            await context.SaveChangesAsync();
+            context.SaveChanges();
 
             context = ContextFactory.Create<JsonContextWithSimpleIdentity>()
                 .WithPhysicalFilesystem(path)
@@ -139,7 +137,7 @@ namespace MobileDB.Tests
         }
 
         [Fact]
-        public async Task Json_Save_Alot_Items_And_Reload_From_Filesystem_And_Query_Them()
+        public void Json_Save_Alot_Items_And_Reload_From_Filesystem_And_Query_Them()
         {
             var path = "C:\\Development\\database\\" + Guid.NewGuid() + "\\";
             var count = 100000;
@@ -166,7 +164,7 @@ namespace MobileDB.Tests
                 });
             }
 
-            await context.SaveChangesAsync();
+            context.SaveChanges();
 
             ReflectionHelper.ClearInternalContextCaches();
             context = ContextFactory.Create<JsonContextWithSimpleIdentity>()

@@ -52,13 +52,11 @@ namespace MobileDB.Stores
 
         public abstract FileSystemPath Path { get; }
 
-        public abstract int SaveChanges(ChangeSet changeSet);
-
         public abstract Task<int> SaveChangesAsync(ChangeSet changeSet);
 
-        public abstract object FindById(object key);
+        public abstract Task<object> FindById(object key);
 
-        public abstract int Count();
+        public abstract Task<int> Count();
 
         protected virtual MetadataEntity EntityMetadata(
             object key,

@@ -26,6 +26,8 @@ using System;
 using System.Collections.Generic;
 using System.IO;
 using System.Linq;
+using System.Threading;
+using System.Threading.Tasks;
 using MobileDB.Common;
 using MobileDB.Common.Utilities;
 using MobileDB.FileSystem.Contracts;
@@ -47,8 +49,10 @@ namespace MobileDB.FileSystem
 
         public string PhysicalRoot { get; private set; }
 
-        public ICollection<FileSystemPath> GetEntities(FileSystemPath path)
+        public async Task<IEnumerable<FileSystemPath>> GetEntities(FileSystemPath path, CancellationToken cancellationToken)
         {
+            await AwaitExtensions.SwitchOffMainThreadAsync(cancellationToken);
+
             var physicalPath = GetPhysicalPath(path);
             var directories = Directory.GetDirectories(physicalPath);
             var files = Directory.GetFiles(physicalPath);
@@ -60,34 +64,44 @@ namespace MobileDB.FileSystem
                 directories.Length + files.Length);
         }
 
-        public bool Exists(FileSystemPath path)
+        public async Task<bool> Exists(FileSystemPath path, CancellationToken cancellationToken)
         {
+            await AwaitExtensions.SwitchOffMainThreadAsync(cancellationToken);
+
             return path.IsFile ? File.Exists(GetPhysicalPath(path)) : Directory.Exists(GetPhysicalPath(path));
         }
 
-        public Stream CreateFile(FileSystemPath path)
+        public async Task<Stream> CreateFile(FileSystemPath path, CancellationToken cancellationToken)
         {
+            await AwaitExtensions.SwitchOffMainThreadAsync(cancellationToken);
+
             if (!path.IsFile)
                 throw new ArgumentException("The specified path is not a file.", "path");
             return File.Create(GetPhysicalPath(path));
         }
 
-        public Stream OpenFile(FileSystemPath path, DesiredFileAccess access)
+        public async Task<Stream> OpenFile(FileSystemPath path, DesiredFileAccess access, CancellationToken cancellationToken)
         {
+            await AwaitExtensions.SwitchOffMainThreadAsync(cancellationToken);
+
             if (!path.IsFile)
                 throw new ArgumentException("The specified path is not a file.", "path");
             return File.Open(GetPhysicalPath(path), FileMode.Open, access.ToFileAccess());
         }
 
-        public void CreateDirectory(FileSystemPath path)
+        public async Task CreateDirectory(FileSystemPath path, CancellationToken cancellationToken)
         {
+            await AwaitExtensions.SwitchOffMainThreadAsync(cancellationToken);
+
             if (!path.IsDirectory)
                 throw new ArgumentException("The specified path is not a directory.", "path");
             Directory.CreateDirectory(GetPhysicalPath(path));
         }
 
-        public void Delete(FileSystemPath path)
+        public async Task Delete(FileSystemPath path, CancellationToken cancellationToken)
         {
+            await AwaitExtensions.SwitchOffMainThreadAsync(cancellationToken);
+
             if (path.IsFile)
                 File.Delete(GetPhysicalPath(path));
             else

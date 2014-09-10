@@ -118,7 +118,7 @@ namespace MobileDB.Tests
                 Value = "some value"
             });
 
-            context.SaveChanges();
+            //context.SaveChanges();
         }
     }
 }

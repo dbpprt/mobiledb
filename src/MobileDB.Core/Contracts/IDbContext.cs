@@ -31,7 +31,6 @@ namespace MobileDB.Contracts
     {
         IEntitySet<T> Set<T>() where T : new();
         object Set(Type entityType);
-        int SaveChanges();
         Task<int> SaveChangesAsync();
     }
 }

@@ -22,14 +22,20 @@
 // SOFTWARE.
 #endregion
 
-using System.Threading.Tasks;
+using MobileDB.Common.Attributes;
+using MobileDB.Contracts;
+using MobileDB.Stores.Json;
 
-namespace MobileDB.Stores.Contracts
+namespace MobileDB.Android.Test.Common
 {
-    public interface IStatefulStore
+    public class JsonContextWithSimpleIdentity : DbContext
     {
-        void Release();
+        public JsonContextWithSimpleIdentity(string connectionString)
+            : base(connectionString)
+        {
+        }
 
-        Task EnsureInitialized();
+        [Store(typeof (JsonStore))]
+        public IEntitySet<SimpleEntityWithIdentity> SimpleEntities { get; set; }
     }
 }

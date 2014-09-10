@@ -24,6 +24,7 @@
 
 using System;
 using System.Linq;
+using System.Threading.Tasks;
 using MobileDB.Common;
 using MobileDB.Common.Utilities;
 using MobileDB.Contracts;
@@ -63,9 +64,9 @@ namespace MobileDB
             _changeSet.Add(entity, EntityState.Deleted);
         }
 
-        public TEntity FindById(object key)
+        public async Task<TEntity> FindById(object key)
         {
-            return _dataSource.FindById(key) as TEntity;
+            return await _dataSource.FindById(key) as TEntity;
         }
 
         public void Update(TEntity entity)
@@ -82,7 +83,7 @@ namespace MobileDB
             _changeSet.Add(dummy, EntityState.Deleted);
         }
 
-        public int Count()
+        public Task<int> Count()
         {
             return _dataSource.Count();
         }

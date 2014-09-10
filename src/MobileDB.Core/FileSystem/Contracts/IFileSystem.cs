@@ -25,21 +25,23 @@
 using System;
 using System.Collections.Generic;
 using System.IO;
+using System.Threading;
+using System.Threading.Tasks;
 
 namespace MobileDB.FileSystem.Contracts
 {
     public interface IFileSystem : IDisposable
     {
-        ICollection<FileSystemPath> GetEntities(FileSystemPath path);
+        Task<IEnumerable<FileSystemPath>> GetEntities(FileSystemPath path, CancellationToken cancellationToken = default(CancellationToken));
 
-        bool Exists(FileSystemPath path);
+        Task<bool> Exists(FileSystemPath path, CancellationToken cancellationToken = default(CancellationToken));
 
-        Stream CreateFile(FileSystemPath path);
+        Task<Stream> CreateFile(FileSystemPath path, CancellationToken cancellationToken = default(CancellationToken));
 
-        Stream OpenFile(FileSystemPath path, DesiredFileAccess access);
+        Task<Stream> OpenFile(FileSystemPath path, DesiredFileAccess access, CancellationToken cancellationToken = default(CancellationToken));
 
-        void CreateDirectory(FileSystemPath path);
+        Task CreateDirectory(FileSystemPath path, CancellationToken cancellationToken = default(CancellationToken));
 
-        void Delete(FileSystemPath path);
+        Task Delete(FileSystemPath path, CancellationToken cancellationToken = default(CancellationToken));
     }
 }

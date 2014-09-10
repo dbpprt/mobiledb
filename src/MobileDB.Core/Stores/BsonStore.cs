@@ -25,6 +25,7 @@
 using System;
 using System.IO;
 using System.Linq;
+using System.Threading;
 using System.Threading.Tasks;
 using MobileDB.Common;
 using MobileDB.Common.Utilities;
@@ -32,13 +33,12 @@ using MobileDB.FileSystem;
 using MobileDB.FileSystem.Contracts;
 using Newtonsoft.Json;
 using Newtonsoft.Json.Bson;
-using Nito.AsyncEx;
 
 namespace MobileDB.Stores
 {
     public class BsonStore : StoreBase
     {
-        private readonly AsyncReaderWriterLock _lock;
+        private readonly ReaderWriterLockSlim _lock;
         private readonly FileSystemPath _path;
         private readonly JsonSerializer _serializer;
 
@@ -47,7 +47,7 @@ namespace MobileDB.Stores
             Type entityType)
             : base(fileSystem, entityType)
         {
-            _lock = new AsyncReaderWriterLock();
+            _lock = new ReaderWriterLockSlim();
             _serializer = JsonSerializer.CreateDefault();
 
             _path = FileSystemPath.Root.AppendDirectory(EntityType.ToFriendlyName());
@@ -58,33 +58,33 @@ namespace MobileDB.Stores
             get { return _path; }
         }
 
-        public override int SaveChanges(ChangeSet changeSet)
+        //public int SaveChanges(ChangeSet changeSet)
+        //{
+        //    using (_lock.WriteLock())
+        //    {
+        //        EnsureInitialized();
+        //        var affectedEntities = 0;
+
+        //        foreach (var change in changeSet)
+        //        {
+        //            var key = change.Key.GetKeyFromEntity();
+        //            ApplyChange(key, change.Key, change.Value);
+        //            affectedEntities++;
+        //        }
+
+        //        return affectedEntities;
+        //    }
+        //}
+
+        private async Task EnsureInitialized()
         {
-            using (_lock.WriterLock())
+            if (!await FileSystem.Exists(Path))
             {
-                EnsureInitialized();
-                var affectedEntities = 0;
-
-                foreach (var change in changeSet)
-                {
-                    var key = change.Key.GetKeyFromEntity();
-                    ApplyChange(key, change.Key, change.Value);
-                    affectedEntities++;
-                }
-
-                return affectedEntities;
+                await FileSystem.CreateDirectory(Path);
             }
         }
 
-        private void EnsureInitialized()
-        {
-            if (!FileSystem.Exists(Path))
-            {
-                FileSystem.CreateDirectory(Path);
-            }
-        }
-
-        private void ApplyChange(
+        private async Task ApplyChange(
             object key,
             object entity,
             EntityState entityState)
@@ -94,18 +94,18 @@ namespace MobileDB.Stores
             switch (entityState)
             {
                 case EntityState.Deleted:
-                    FileSystem.Delete(targetPath);
+                    await FileSystem.Delete(targetPath);
                     break;
 
                 case EntityState.Added:
                     var metadata = EntityMetadata(key, entity, EntityState.Added, null);
-                    using (var stream = FileSystem.CreateFile(targetPath))
+                    using (var stream = await FileSystem.CreateFile(targetPath))
                         Serialize(stream, metadata);
                     break;
 
                 case EntityState.Updated:
-                    var updatedMetadata = EntityMetadata(key, entity, EntityState.Updated, FindByIdInternal(key));
-                    using (var stream = FileSystem.CreateFile(targetPath))
+                    var updatedMetadata = EntityMetadata(key, entity, EntityState.Updated, await FindByIdInternal(key));
+                    using (var stream = await FileSystem.CreateFile(targetPath))
                         Serialize(stream, updatedMetadata);
                     break;
             }
@@ -132,30 +132,30 @@ namespace MobileDB.Stores
             throw new NotImplementedException();
         }
 
-        public override int Count()
+        public override async Task<int> Count()
         {
-            using (_lock.ReaderLock())
+            using (_lock.ReadLock())
             {
-                EnsureInitialized();
+                await EnsureInitialized();
 
-                return FileSystem.GetEntities(Path).Count();
+                return (await FileSystem.GetEntities(Path)).Count();
             }
         }
 
-        private MetadataEntity FindByIdInternal(object key)
+        private async Task<MetadataEntity> FindByIdInternal(object key)
         {
-            EnsureInitialized();
+            await EnsureInitialized();
             var targetPath = Path.AppendFile(key.ToString());
 
-            using (var stream = FileSystem.OpenFile(targetPath, DesiredFileAccess.Read))
+            using (var stream = await FileSystem.OpenFile(targetPath, DesiredFileAccess.Read))
                 return Deserialize(stream);
         }
 
-        public override object FindById(object key)
+        public override async Task<object> FindById(object key)
         {
-            using (_lock.ReaderLock())
+            using (_lock.ReadLock())
             {
-                return FindByIdInternal(key).EntityOfType(EntityType);
+                return (await FindByIdInternal(key)).EntityOfType(EntityType);
             }
         }
     }
