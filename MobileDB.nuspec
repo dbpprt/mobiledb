@@ -2,7 +2,7 @@
 <package >
   <metadata>
     <id>MobileDB</id>
-    <version>0.0.6-alpha</version>
+    <version>0.0.7-alpha</version>
     <authors>Dennis Bappert</authors>
     <owners>Dennis Bappert</owners>
     <licenseUrl>https://github.com/flumbee/mobiledb/blob/master/LICENSE</licenseUrl>

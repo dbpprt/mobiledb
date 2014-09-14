@@ -38,19 +38,28 @@ namespace MobileDB.Common.Factory
 
         public T Build()
         {
-            var segments = new List<string>();
-
-            foreach (var tuple in _tuples)
-            {
-                var segment = String.Format("{0}{1}{2}", tuple.Key, ConnectionStringConstants.SegmentSeperator,
-                    tuple.Value);
-                segments.Add(segment);
-            }
-
-            var connectionString = string.Join(
-                ConnectionStringConstants.TupleSeperator.ToString(),
-                segments);
+            var connectionString = ConnectionString;
             return (T) Activator.CreateInstance(typeof (T), connectionString);
+        }
+
+        private string ConnectionString
+        {
+            get
+            {
+                var segments = new List<string>();
+
+                foreach (var tuple in _tuples)
+                {
+                    var segment = String.Format("{0}{1}{2}", tuple.Key, ConnectionStringConstants.SegmentSeperator,
+                        tuple.Value);
+                    segments.Add(segment);
+                }
+
+                var connectionString = string.Join(
+                    ConnectionStringConstants.TupleSeperator.ToString(),
+                    segments);
+                return connectionString;
+            }
         }
     }
 }
