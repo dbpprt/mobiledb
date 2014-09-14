@@ -10,7 +10,7 @@ You like **EntityFramework's** API and the way of accessing tables and save data
 - EntityFramework inspired DbContext and EntitySets
 - It relies on JSON.NET so it will serialize nearly any types 
 - Primary keys for entities
-- Extensive entity validation powered by [ExpressiveAnnotations](https://github.com/JaroslawWaliszko/ExpressiveAnnotations "ExpressiveAnnotations") (see Examples)
+- Extensive entity validation powered by [MobileDB](https://github.com/JaroslawWaliszko/ExpressiveAnnotations "MobileDB") (see Examples)
 - It is **blazing fast**! Adding 100.000 items and reloading them from the filesystem takes about ~1sec
 - **A friendly license for developers! (MIT licensed)**
 - ......
@@ -31,6 +31,14 @@ You might also wonder about storing data in memory. Let's think about a blog wit
 The answer is really simple: think about the size of your data? Is it really more than some megabytes of data? Probably not. MobileDB comes with a BSON store who doesn't keep data in memory. So it's perfect to save your files (pictures, attachments) there and just reference it your other entities. 
 
 **I created MobileDB because im to lazy to install a SQL-Server Express on every small application i use and i want a EntityFramework like experience when working with desktop and mobile applications.**
+
+### How to install
+
+Just grab the MobileDB package from nuget and install it
+
+```
+Install-Package MobileDB
+```
 
 ### A simple sample ###
 

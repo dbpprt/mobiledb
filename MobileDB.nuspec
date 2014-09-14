@@ -1,0 +1,24 @@
+<?xml version="1.0"?>
+<package >
+  <metadata>
+    <id>MobileDB</id>
+    <version>0.0.6-alpha</version>
+    <authors>Dennis Bappert</authors>
+    <owners>Dennis Bappert</owners>
+    <licenseUrl>https://github.com/flumbee/mobiledb/blob/master/LICENSE</licenseUrl>
+    <projectUrl>https://github.com/flumbee/mobiledb/</projectUrl>
+    <requireLicenseAcceptance>false</requireLicenseAcceptance>
+    <description>You like EntityFramework and use it frequently but sometimes you need just a simple embedded database for an app or a small application, then MobileDB ist just right for you. It's a lightweight, fast and simple JSON database with an EntityFramework inspired API.
+	</description>
+    <releaseNotes>Initial nuget release. Visit project site for more information.</releaseNotes>
+    <copyright>Copyright 2014</copyright>
+    <tags>database json entityframework embedded</tags>
+	<dependencies>
+      <dependency id="Newtonsoft.Json" version="6.0.5" />
+    </dependencies>
+  </metadata>
+  <files>
+    <file src="build\MobileDB.dll" target="lib\net45" />
+	<file src="build\MobileDB.Core.dll" target="lib\net45" />
+  </files>
+</package>

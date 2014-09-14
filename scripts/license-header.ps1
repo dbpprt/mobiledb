@@ -1,6 +1,6 @@
 
 function Ensure-LicenseHeader($sourceDirectory, $filter, $headerFile) {
-    $items = Get-ChildItem $sourceDirectory -Recurse -Filter $filter -ErrorAction SilentlyContinue -ErrorVariable err
+    $items = Get-ChildItem $sourceDirectory -Recurse -Filter $filter -ErrorAction SilentlyContinue -ErrorVariable err | ? { $_.Name.StartsWith('TemporaryGeneratedFile_') -eq $false }
  
     foreach ($errorRecord in $err)
     {
