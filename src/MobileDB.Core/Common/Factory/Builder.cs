@@ -42,7 +42,7 @@ namespace MobileDB.Common.Factory
             return (T) Activator.CreateInstance(typeof (T), connectionString);
         }
 
-        private string ConnectionString
+        public string ConnectionString
         {
             get
             {
