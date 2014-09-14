@@ -35,14 +35,20 @@ namespace MobileDB.Contracts
 
         void RemoveById(object key);
 
-        Task<TEntity> FindById(object key);
+        Task<TEntity> FindByIdAsync(object key);
+
+        TEntity FindById(object key);
 
         void Update(TEntity entity);
 
         IQueryable<TEntity> AsQueryable();
 
+        Task<IQueryable<TEntity>> AsQueryableAsync();
+
         void Release();
 
-        Task<int> Count();
+        Task<int> CountAsync();
+
+        int Count();
     }
 }

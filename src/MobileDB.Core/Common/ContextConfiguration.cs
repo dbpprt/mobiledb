@@ -31,6 +31,6 @@ namespace MobileDB.Common
     {
         public List<EntityConfiguration> EntityConfigurations { get; set; }
 
-        public IFileSystem FileSystem { get; set; }
+        public FileSystemBase FileSystem { get; set; }
     }
 }

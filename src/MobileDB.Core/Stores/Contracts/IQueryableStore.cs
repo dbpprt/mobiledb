@@ -23,11 +23,14 @@
 #endregion
 
 using System.Linq;
+using System.Threading.Tasks;
 
 namespace MobileDB.Stores.Contracts
 {
     public interface IQueryableStore
     {
         IQueryable<T> AsQueryable<T>();
+
+        Task<IQueryable<T>> AsQueryableAsync<T>();
     }
 }

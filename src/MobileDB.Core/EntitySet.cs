@@ -64,9 +64,14 @@ namespace MobileDB
             _changeSet.Add(entity, EntityState.Deleted);
         }
 
-        public async Task<TEntity> FindById(object key)
+        public async Task<TEntity> FindByIdAsync(object key)
         {
-            return await _dataSource.FindById(key) as TEntity;
+            return await _dataSource.FindByIdAsync(key) as TEntity;
+        }
+
+        public TEntity FindById(object key)
+        {
+            return _dataSource.FindById(key) as TEntity;
         }
 
         public void Update(TEntity entity)
@@ -83,7 +88,12 @@ namespace MobileDB
             _changeSet.Add(dummy, EntityState.Deleted);
         }
 
-        public Task<int> Count()
+        public Task<int> CountAsync()
+        {
+            return _dataSource.CountAsync();
+        }
+
+        public int Count()
         {
             return _dataSource.Count();
         }
@@ -97,6 +107,17 @@ namespace MobileDB
                     "The store for this entity doesnt support AsQueryable. See docs for more info.");
 
             return queryable.AsQueryable<TEntity>();
+        }
+
+        public async Task<IQueryable<TEntity>> AsQueryableAsync()
+        {
+            var queryable = _dataSource as IQueryableStore;
+
+            if (queryable == null)
+                throw new NotSupportedException(
+                    "The store for this entity doesnt support AsQueryable. See docs for more info.");
+
+            return await queryable.AsQueryableAsync<TEntity>();
         }
 
         public void Release()

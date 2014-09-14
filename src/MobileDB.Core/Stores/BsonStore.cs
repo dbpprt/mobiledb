@@ -58,25 +58,7 @@ namespace MobileDB.Stores
             get { return _path; }
         }
 
-        //public int SaveChanges(ChangeSet changeSet)
-        //{
-        //    using (_lock.WriteLock())
-        //    {
-        //        EnsureInitialized();
-        //        var affectedEntities = 0;
-
-        //        foreach (var change in changeSet)
-        //        {
-        //            var key = change.Key.GetKeyFromEntity();
-        //            ApplyChange(key, change.Key, change.Value);
-        //            affectedEntities++;
-        //        }
-
-        //        return affectedEntities;
-        //    }
-        //}
-
-        private async Task EnsureInitialized()
+        private async Task EnsureInitializedAsync()
         {
             if (!await AsyncFileSystem.Exists(Path))
             {
@@ -84,7 +66,15 @@ namespace MobileDB.Stores
             }
         }
 
-        private async Task ApplyChange(
+        private void EnsureInitialized()
+        {
+            if (!FileSystem.Exists(Path))
+            {
+                FileSystem.CreateDirectory(Path);
+            }
+        }
+
+        private async Task ApplyChangeAsync(
             object key,
             object entity,
             EntityState entityState)
@@ -104,8 +94,35 @@ namespace MobileDB.Stores
                     break;
 
                 case EntityState.Updated:
-                    var updatedMetadata = EntityMetadata(key, entity, EntityState.Updated, await FindByIdInternal(key));
+                    var updatedMetadata = EntityMetadata(key, entity, EntityState.Updated, await FindByIdInternalAsync(key));
                     using (var stream = await AsyncFileSystem.CreateFile(targetPath))
+                        Serialize(stream, updatedMetadata);
+                    break;
+            }
+        }
+
+        private void ApplyChange(
+            object key,
+            object entity,
+            EntityState entityState)
+        {
+            var targetPath = Path.AppendFile(key.ToString());
+
+            switch (entityState)
+            {
+                case EntityState.Deleted:
+                    FileSystem.Delete(targetPath);
+                    break;
+
+                case EntityState.Added:
+                    var metadata = EntityMetadata(key, entity, EntityState.Added, null);
+                    using (var stream = FileSystem.CreateFile(targetPath))
+                        Serialize(stream, metadata);
+                    break;
+
+                case EntityState.Updated:
+                    var updatedMetadata = EntityMetadata(key, entity, EntityState.Updated, FindByIdInternal(key));
+                    using (var stream = FileSystem.CreateFile(targetPath))
                         Serialize(stream, updatedMetadata);
                     break;
             }
@@ -127,35 +144,105 @@ namespace MobileDB.Stores
             }
         }
 
-        public override Task<int> SaveChangesAsync(ChangeSet changeSet)
+        public override async Task<int> SaveChangesAsync(ChangeSet changeSet)
         {
-            throw new NotImplementedException();
+            var affectedEntities = 0;
+            using (_lock.WriteLock())
+            {
+                await EnsureInitializedAsync();
+
+                foreach (var change in changeSet)
+                {
+                    await ApplyChangeAsync(
+                        change.Key.GetKeyFromEntity(),
+                        change.Key,
+                        change.Value
+                        );
+
+                    affectedEntities++;
+                }
+            }
+
+            return affectedEntities;
         }
 
-        public override async Task<int> Count()
+        public override async Task<int> CountAsync()
         {
             using (_lock.ReadLock())
             {
-                await EnsureInitialized();
+                await EnsureInitializedAsync();
 
                 return (await AsyncFileSystem.GetEntities(Path)).Count();
             }
         }
 
-        private async Task<MetadataEntity> FindByIdInternal(object key)
+        public override int SaveChanges(ChangeSet changeSet)
         {
-            await EnsureInitialized();
+            var affectedEntities = 0;
+            using (_lock.WriteLock())
+            {
+                EnsureInitialized();
+
+                foreach (var change in changeSet)
+                {
+                    ApplyChange(
+                        change.Key.GetKeyFromEntity(),
+                        change.Key,
+                        change.Value
+                        );
+
+                    affectedEntities++;
+                }
+            }
+
+            return affectedEntities;
+        }
+
+        public override object FindById(object key)
+        {
+            using (_lock.ReadLock())
+            {
+                EnsureInitialized();
+
+                return (FindByIdInternal(key)).EntityOfType(EntityType);
+            }
+        }
+
+        public override int Count()
+        {
+            using (_lock.ReadLock())
+            {
+                EnsureInitialized();
+
+                return (FileSystem.GetEntities(Path)).Count();
+            }
+        }
+
+        private async Task<MetadataEntity> FindByIdInternalAsync(object key)
+        {
+            await EnsureInitializedAsync();
             var targetPath = Path.AppendFile(key.ToString());
 
             using (var stream = await AsyncFileSystem.OpenFile(targetPath, DesiredFileAccess.Read))
                 return Deserialize(stream);
         }
 
-        public override async Task<object> FindById(object key)
+        private MetadataEntity FindByIdInternal(object key)
+        {
+            EnsureInitialized();
+            var targetPath = Path.AppendFile(key.ToString());
+
+            using (var stream = FileSystem.OpenFile(targetPath, DesiredFileAccess.Read))
+                return Deserialize(stream);
+        }
+
+        public override async Task<object> FindByIdAsync(object key)
         {
             using (_lock.ReadLock())
             {
-                return (await FindByIdInternal(key)).EntityOfType(EntityType);
+                await EnsureInitializedAsync();
+
+                return (await FindByIdInternalAsync(key)).EntityOfType(EntityType);
             }
         }
     }

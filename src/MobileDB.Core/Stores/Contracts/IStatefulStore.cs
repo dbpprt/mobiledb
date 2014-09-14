@@ -30,6 +30,8 @@ namespace MobileDB.Stores.Contracts
     {
         void Release();
 
-        Task EnsureInitialized();
+        Task EnsureInitializedAsync();
+
+        void EnsureInitialized();
     }
 }

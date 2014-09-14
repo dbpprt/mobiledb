@@ -50,7 +50,7 @@ namespace MobileDB
 
         public bool ValidateEntities { get; protected set; }
         public ConnectionString ConnectionString { get; private set; }
-        public IFileSystem FileSystem { get; private set; }
+        public FileSystemBase FileSystem { get; private set; }
 
         private IServiceProvider ServiceProvider { get; set; }
 
@@ -134,7 +134,7 @@ namespace MobileDB
                 EntityConfigurations = new List<EntityConfiguration>()
             };
 
-            var fileSystem = Activator.CreateInstance(fileSystemType, ConnectionString) as IFileSystem;
+            var fileSystem = Activator.CreateInstance(fileSystemType, ConnectionString) as FileSystemBase;
 
             if (fileSystem == null)
             {

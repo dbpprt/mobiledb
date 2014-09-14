@@ -86,6 +86,21 @@ namespace MobileDB.Stores.Json
             }
         }
 
+        public async Task<IQueryable<T>> AsQueryableAsync<T>()
+        {
+            await AwaitExtensions.SwitchOffMainThreadAsync(default(CancellationToken));
+            await EnsureInitializedAsync();
+
+            using (_lock.ReadLock())
+            {
+                return _entities.Values
+                    .Select(_ => _.Item1)
+                    .OfType<T>()
+                    .ToList()
+                    .AsQueryable();
+            }
+        }
+
         public void Release()
         {
             using (_lock.WriteLock())
@@ -95,11 +110,11 @@ namespace MobileDB.Stores.Json
             }
         }
 
-        public async Task EnsureInitialized()
+        public async Task EnsureInitializedAsync()
         {
             if (_initialized) return;
 
-            using (_lock.ReadLock())
+            using (_lock.WriteLock())
             {
                 if (!await AsyncFileSystem.Exists(Path))
                 {
@@ -125,9 +140,39 @@ namespace MobileDB.Stores.Json
             }
         }
 
+        public void EnsureInitialized()
+        {
+            if (_initialized) return;
+
+            using (_lock.WriteLock())
+            {
+                if (!FileSystem.Exists(Path))
+                {
+                    _initialized = true;
+                    return;
+                }
+
+                using (var stream = FileSystem.OpenFile(Path, DesiredFileAccess.Read))
+                using (var instream = new StreamReader(stream))
+                {
+                    var json = "[" + instream.ReadToEnd().Replace(Environment.NewLine, ",") + "]";
+                    var entities = JsonConvert.DeserializeObject(
+                        json,
+                        typeof(List<>).MakeGenericType(typeof(MetadataEntity))
+                        ) as IEnumerable<MetadataEntity>;
+
+                    _entities = entities.ToDictionary(
+                        key => key.Identity,
+                        value => new Tuple<object, MetadataEntity>(value.EntityOfType(EntityType), value)
+                        );
+                    _initialized = true;
+                }
+            }
+        }
+
         public override async Task<int> SaveChangesAsync(ChangeSet changeSet)
         {
-            await EnsureInitialized();
+            await EnsureInitializedAsync();
 
             using (_lock.WriteLock())
             {
@@ -148,14 +193,29 @@ namespace MobileDB.Stores.Json
                     .Select(_ => _.Item2)
                     .ToList();
 
-                using (var stream = await AsyncFileSystem.CreateFile(Path))
-                using (var outstream = new StreamWriter(stream))
-                {
-                    var writer = new JsonTextWriter(outstream);
-                    _listSerializer.WriteJson(writer, raw, _serializer);
-                }
+                await FlushAsync(raw);
 
                 return affectedEntities;
+            }
+        }
+
+        private async Task FlushAsync(List<MetadataEntity> raw)
+        {
+            using (var stream = await AsyncFileSystem.CreateFile(Path))
+            using (var outstream = new StreamWriter(stream))
+            {
+                var writer = new JsonTextWriter(outstream);
+                _listSerializer.WriteJson(writer, raw, _serializer);
+            }
+        }
+
+        private void Flush(List<MetadataEntity> raw)
+        {
+            using (var stream = FileSystem.CreateFile(Path))
+            using (var outstream = new StreamWriter(stream))
+            {
+                var writer = new JsonTextWriter(outstream);
+                _listSerializer.WriteJson(writer, raw, _serializer);
             }
         }
 
@@ -183,9 +243,59 @@ namespace MobileDB.Stores.Json
             }
         }
 
-        public override async Task<int> Count()
+        public override async Task<int> CountAsync()
         {
             await AwaitExtensions.SwitchOffMainThreadAsync(default(CancellationToken));
+            await EnsureInitializedAsync();
+            return Count();
+        }
+
+        public override int SaveChanges(ChangeSet changeSet)
+        {
+            EnsureInitialized();
+
+            using (_lock.WriteLock())
+            {
+                var affectedEntities = 0;
+
+                foreach (var change in changeSet)
+                {
+                    var key = change.Key.GetKeyFromEntity();
+                    Tuple<object, MetadataEntity> existing;
+                    _entities.TryGetValue(key, out existing);
+
+                    ApplyChange(key, change.Key, change.Value, existing);
+
+                    affectedEntities++;
+                }
+
+                var raw = _entities.Values
+                    .Select(_ => _.Item2)
+                    .ToList();
+
+                Flush(raw);
+
+                return affectedEntities;
+            }
+        }
+
+        public override object FindById(object key)
+        {
+            EnsureInitialized();
+
+            using (_lock.ReadLock())
+            {
+                Tuple<object, MetadataEntity> entity;
+                _entities.TryGetValue(key, out entity);
+                return entity != null
+                    ? entity.Item1
+                    : null;
+            }
+        }
+
+        public override int Count()
+        {
+            EnsureInitialized();
 
             using (_lock.ReadLock())
             {
@@ -193,9 +303,10 @@ namespace MobileDB.Stores.Json
             }
         }
 
-        public override async Task<object> FindById(object key)
+        public override async Task<object> FindByIdAsync(object key)
         {
-            await EnsureInitialized();
+            await AwaitExtensions.SwitchOffMainThreadAsync(default(CancellationToken));
+            await EnsureInitializedAsync();
 
             using (_lock.ReadLock())
             {

@@ -34,8 +34,8 @@ namespace MobileDB.Stores.Contracts
 
         Task<int> SaveChangesAsync(ChangeSet changeSet);
 
-        Task<int> Count();
+        Task<int> CountAsync();
 
-        Task<object> FindById(object key);
+        Task<object> FindByIdAsync(object key);
     }
 }

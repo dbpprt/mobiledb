@@ -78,9 +78,15 @@ namespace MobileDB.Stores
 
         public abstract Task<int> SaveChangesAsync(ChangeSet changeSet);
 
-        public abstract Task<object> FindById(object key);
+        public abstract Task<object> FindByIdAsync(object key);
 
-        public abstract Task<int> Count();
+        public abstract Task<int> CountAsync();
+
+        public abstract int SaveChanges(ChangeSet changeSet);
+
+        public abstract object FindById(object key);
+
+        public abstract int Count();
 
         protected virtual MetadataEntity EntityMetadata(
             object key,
