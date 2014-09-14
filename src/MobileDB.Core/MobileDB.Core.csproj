@@ -36,11 +36,15 @@
   <ItemGroup>
     <Compile Include="Common\Attributes\JsonAttribute.cs" />
     <Compile Include="Common\Attributes\LazyBson.cs" />
+    <Compile Include="Common\ConnectionString.cs" />
+    <Compile Include="Common\SimpleServiceProvider.cs" />
     <Compile Include="Common\Utilities\AwaitExtensions.cs" />
     <Compile Include="Common\Utilities\LockHelper.cs" />
     <Compile Include="Contracts\IEntityValidator.cs" />
-    <Compile Include="ServiceLocator.cs" />
-    <Compile Include="DbContext.cs" />
+    <Compile Include="FileSystem\Contracts\FileSystemBase.cs" />
+    <Compile Include="FileSystem\Contracts\IAsyncFileSystem.cs" />
+    <Compile Include="MobileDB.cs" />
+    <Compile Include="DbContextBase.cs" />
     <Compile Include="Common\Attributes\EntityDecoratorAttribute.cs" />
     <Compile Include="Common\Attributes\IdentityAttribute.cs" />
     <Compile Include="Common\Attributes\StoreAttribute.cs" />
@@ -103,6 +107,9 @@
   <ItemGroup>
     <Reference Include="Newtonsoft.Json">
       <HintPath>..\packages\Newtonsoft.Json.6.0.5\lib\portable-net45+wp80+win8+wpa81\Newtonsoft.Json.dll</HintPath>
+    </Reference>
+    <Reference Include="Nito.AsyncEx">
+      <HintPath>..\packages\Nito.AsyncEx.3.0.0\lib\portable-net45+netcore45+wp8+wpa81+MonoTouch+MonoAndroid\Nito.AsyncEx.dll</HintPath>
     </Reference>
   </ItemGroup>
   <ItemGroup>

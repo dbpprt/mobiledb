@@ -34,15 +34,39 @@ namespace MobileDB.Stores
 {
     public abstract class StoreBase : IStore
     {
-        protected readonly IFileSystem FileSystem;
+        protected IFileSystem FileSystem
+        {
+            get
+            {
+                if (_fileSystem == null)
+                    throw new NotSupportedException("The loaded filesystem doesnt support synchronous access!");
+                return _fileSystem;
+            }
+        }
+
+        protected IAsyncFileSystem AsyncFileSystem
+        {
+            get
+            {
+                if (_asyncFileSystem == null)
+                    throw new NotSupportedException("The loaded filesystem doesnt support async access!");
+                return _asyncFileSystem;
+            }
+        }
+
         private readonly Type _entityType;
+        private readonly IAsyncFileSystem _asyncFileSystem;
+        private readonly IFileSystem _fileSystem;
 
         public StoreBase(
-            IFileSystem fileSystem,
+            FileSystemBase fileSystem,
             Type entityType)
         {
-            FileSystem = fileSystem;
             _entityType = entityType;
+
+            _asyncFileSystem = fileSystem as IAsyncFileSystem;
+            _fileSystem = fileSystem as IFileSystem;
+
         }
 
         protected Type EntityType

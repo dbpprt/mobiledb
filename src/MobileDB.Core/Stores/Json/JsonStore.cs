@@ -52,7 +52,7 @@ namespace MobileDB.Stores.Json
         // <Key, Tuple<Entity, Metadata>>
 
         public JsonStore(
-            IFileSystem fileSystem,
+            FileSystemBase fileSystem,
             Type entityType
             )
             : base(fileSystem, entityType)
@@ -101,13 +101,13 @@ namespace MobileDB.Stores.Json
 
             using (_lock.ReadLock())
             {
-                if (!await FileSystem.Exists(Path))
+                if (!await AsyncFileSystem.Exists(Path))
                 {
                     _initialized = true;
                     return;
                 }
 
-                using (var stream = await FileSystem.OpenFile(Path, DesiredFileAccess.Read))
+                using (var stream = await AsyncFileSystem.OpenFile(Path, DesiredFileAccess.Read))
                 using (var instream = new StreamReader(stream))
                 {
                     var json = "[" + instream.ReadToEnd().Replace(Environment.NewLine, ",") + "]";
@@ -148,7 +148,7 @@ namespace MobileDB.Stores.Json
                     .Select(_ => _.Item2)
                     .ToList();
 
-                using (var stream = await FileSystem.CreateFile(Path))
+                using (var stream = await AsyncFileSystem.CreateFile(Path))
                 using (var outstream = new StreamWriter(stream))
                 {
                     var writer = new JsonTextWriter(outstream);

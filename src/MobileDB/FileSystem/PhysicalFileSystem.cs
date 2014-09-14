@@ -34,11 +34,12 @@ using MobileDB.FileSystem.Contracts;
 
 namespace MobileDB.FileSystem
 {
-    public class PhysicalFileSystem : IFileSystem
+    public class PhysicalFileSystem : FileSystemBase, IAsyncFileSystem
     {
-        public PhysicalFileSystem(string connectionString)
+        public PhysicalFileSystem(ConnectionString connectionString)
+            : base(connectionString)
         {
-            var physicalRoot = connectionString.ConnectionStringPart(ConnectionStringConstants.Path);
+            var physicalRoot = ConnectionString.GetPart(ConnectionStringConstants.Path);
 
             if (!Path.IsPathRooted(physicalRoot))
                 physicalRoot = Path.GetFullPath(physicalRoot);

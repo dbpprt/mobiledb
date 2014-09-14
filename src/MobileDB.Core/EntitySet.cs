@@ -50,7 +50,7 @@ namespace MobileDB
             _dataSource = dataSource;
             _validateEntity = validateEntity;
             if (validateEntity)
-                _validator = ServiceLocator.Validator;
+                _validator = MobileDB.Validator;
         }
 
         public void Add(TEntity entity)

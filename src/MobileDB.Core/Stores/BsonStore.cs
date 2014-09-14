@@ -43,7 +43,7 @@ namespace MobileDB.Stores
         private readonly JsonSerializer _serializer;
 
         public BsonStore(
-            IFileSystem fileSystem,
+            FileSystemBase fileSystem,
             Type entityType)
             : base(fileSystem, entityType)
         {
@@ -78,9 +78,9 @@ namespace MobileDB.Stores
 
         private async Task EnsureInitialized()
         {
-            if (!await FileSystem.Exists(Path))
+            if (!await AsyncFileSystem.Exists(Path))
             {
-                await FileSystem.CreateDirectory(Path);
+                await AsyncFileSystem.CreateDirectory(Path);
             }
         }
 
@@ -94,18 +94,18 @@ namespace MobileDB.Stores
             switch (entityState)
             {
                 case EntityState.Deleted:
-                    await FileSystem.Delete(targetPath);
+                    await AsyncFileSystem.Delete(targetPath);
                     break;
 
                 case EntityState.Added:
                     var metadata = EntityMetadata(key, entity, EntityState.Added, null);
-                    using (var stream = await FileSystem.CreateFile(targetPath))
+                    using (var stream = await AsyncFileSystem.CreateFile(targetPath))
                         Serialize(stream, metadata);
                     break;
 
                 case EntityState.Updated:
                     var updatedMetadata = EntityMetadata(key, entity, EntityState.Updated, await FindByIdInternal(key));
-                    using (var stream = await FileSystem.CreateFile(targetPath))
+                    using (var stream = await AsyncFileSystem.CreateFile(targetPath))
                         Serialize(stream, updatedMetadata);
                     break;
             }
@@ -138,7 +138,7 @@ namespace MobileDB.Stores
             {
                 await EnsureInitialized();
 
-                return (await FileSystem.GetEntities(Path)).Count();
+                return (await AsyncFileSystem.GetEntities(Path)).Count();
             }
         }
 
@@ -147,7 +147,7 @@ namespace MobileDB.Stores
             await EnsureInitialized();
             var targetPath = Path.AppendFile(key.ToString());
 
-            using (var stream = await FileSystem.OpenFile(targetPath, DesiredFileAccess.Read))
+            using (var stream = await AsyncFileSystem.OpenFile(targetPath, DesiredFileAccess.Read))
                 return Deserialize(stream);
         }
 

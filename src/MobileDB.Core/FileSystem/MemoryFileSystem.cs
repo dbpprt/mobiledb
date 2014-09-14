@@ -27,13 +27,14 @@ using System.Collections.Generic;
 using System.IO;
 using System.Threading;
 using System.Threading.Tasks;
+using MobileDB.Common;
 using MobileDB.Common.Utilities;
 using MobileDB.Exceptions;
 using MobileDB.FileSystem.Contracts;
 
 namespace MobileDB.FileSystem
 {
-    public class MemoryFileSystem : IFileSystem
+    public class MemoryFileSystem : FileSystemBase, IAsyncFileSystem
     {
         private readonly IDictionary<FileSystemPath, LinkedList<FileSystemPath>> _directories;
         private readonly IDictionary<FileSystemPath, MemoryFile> _files;
@@ -42,7 +43,8 @@ namespace MobileDB.FileSystem
         ///     Connection string is required by convention for every FileSystems
         /// </summary>
         /// <param name="connectionString"></param>
-        public MemoryFileSystem(string connectionString = null)
+        public MemoryFileSystem(ConnectionString connectionString)
+            : base(connectionString)
         {
             _files = new Dictionary<FileSystemPath, MemoryFile>();
             _directories = new Dictionary<FileSystemPath, LinkedList<FileSystemPath>>

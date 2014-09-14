@@ -30,7 +30,7 @@ namespace MobileDB.Common.Factory
     {
         public static Builder<T> WithPhysicalFilesystem<T>(this ContextBuilder<T> contextBuilder, string databasePath)
         {
-            ServiceLocator.AddStore(typeof (PhysicalFileSystem));
+            MobileDB.AddFileSystem(typeof (PhysicalFileSystem));
 
             contextBuilder.Tuples.Add(ConnectionStringConstants.Filesystem, typeof (PhysicalFileSystem).FullName);
             contextBuilder.Tuples.Add(ConnectionStringConstants.Path, databasePath);

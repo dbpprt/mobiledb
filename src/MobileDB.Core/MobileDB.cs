@@ -27,21 +27,22 @@ using System.Collections.Generic;
 using System.Linq;
 using MobileDB.Common.Validation;
 using MobileDB.Contracts;
+using MobileDB.FileSystem;
 using MobileDB.Stores;
 using MobileDB.Stores.Json;
 
 namespace MobileDB
 {
-    public static class ServiceLocator
+    public static class MobileDB
     {
-        private static readonly List<Type> SupportedStores;
+        private static readonly List<Type> SupportedFileSystems;
         private static IEntityValidator _entityValidator;
 
         private static readonly object Sync;
 
-        static ServiceLocator()
+        static MobileDB()
         {
-            SupportedStores = new List<Type>();
+            SupportedFileSystems = new List<Type>();
             Sync = new object();
 
             RegisterDefaultServices();
@@ -67,25 +68,24 @@ namespace MobileDB
 
         private static void RegisterDefaultServices()
         {
-            SupportedStores.Add(typeof (JsonStore));
-            SupportedStores.Add(typeof (BsonStore));
+            SupportedFileSystems.Add(typeof (MemoryFileSystem));
             _entityValidator = new EntityValidator();
         }
 
-        public static void AddStore(Type type)
+        public static void AddFileSystem(Type type)
         {
             lock (Sync)
             {
-                if (!SupportedStores.Contains(type))
-                    SupportedStores.Add(type);
+                if (!SupportedFileSystems.Contains(type))
+                    SupportedFileSystems.Add(type);
             }
         }
 
-        public static IEnumerable<Type> Stores()
+        public static IEnumerable<Type> FileSystems()
         {
             lock (Sync)
             {
-                return SupportedStores.ToList();
+                return SupportedFileSystems.ToList();
             }
         }
     }
