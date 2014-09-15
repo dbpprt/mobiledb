@@ -90,6 +90,11 @@ namespace MobileDB
                  let changeset = trackedChangeSet.Value
                  select configuration.EntityStore.SaveChanges(changeset)).Sum();
 
+            foreach (var trackedChangeSet in _changeTracker)
+            {
+                trackedChangeSet.Value.Clear();
+            }
+
             return changedEntities;
         }
 
@@ -102,7 +107,14 @@ namespace MobileDB
                  let configuration = trackedChangeSet.Key
                  let changeset = trackedChangeSet.Value
                  select configuration.EntityStore.SaveChangesAsync(changeset));
-            return await Task.WhenAll(tasks).ContinueWith(task => task.Result.Sum());
+            var changedEntities = await Task.WhenAll(tasks).ContinueWith(task => task.Result.Sum());
+
+            foreach (var trackedChangeSet in _changeTracker)
+            {
+                trackedChangeSet.Value.Clear();
+            }
+
+            return changedEntities;
         }
 
         public IEntitySet<T> Set<T>() where T : new()

@@ -34,16 +34,16 @@ namespace MobileDB.FileSystem.Contracts
 {
     public interface IAsyncFileSystem : IDisposable
     {
-        Task<IEnumerable<FileSystemPath>> GetEntities(FileSystemPath path, CancellationToken cancellationToken = default(CancellationToken));
+        Task<IEnumerable<FileSystemPath>> GetEntitiesAsync(FileSystemPath path, CancellationToken cancellationToken = default(CancellationToken));
 
-        Task<bool> Exists(FileSystemPath path, CancellationToken cancellationToken = default(CancellationToken));
+        Task<bool> ExistsAsync(FileSystemPath path, CancellationToken cancellationToken = default(CancellationToken));
 
-        Task<Stream> CreateFile(FileSystemPath path, CancellationToken cancellationToken = default(CancellationToken));
+        Task<Stream> CreateFileAsync(FileSystemPath path, CancellationToken cancellationToken = default(CancellationToken));
 
-        Task<Stream> OpenFile(FileSystemPath path, DesiredFileAccess access, CancellationToken cancellationToken = default(CancellationToken));
+        Task<Stream> OpenFileAsync(FileSystemPath path, DesiredFileAccess access, CancellationToken cancellationToken = default(CancellationToken));
 
-        Task CreateDirectory(FileSystemPath path, CancellationToken cancellationToken = default(CancellationToken));
+        Task CreateDirectoryAsync(FileSystemPath path, CancellationToken cancellationToken = default(CancellationToken));
 
-        Task Delete(FileSystemPath path, CancellationToken cancellationToken = default(CancellationToken));
+        Task DeleteAsync(FileSystemPath path, CancellationToken cancellationToken = default(CancellationToken));
     }
 }

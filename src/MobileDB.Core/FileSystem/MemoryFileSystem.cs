@@ -34,7 +34,7 @@ using MobileDB.FileSystem.Contracts;
 
 namespace MobileDB.FileSystem
 {
-    public class MemoryFileSystem : FileSystemBase, IAsyncFileSystem
+    public class MemoryFileSystem : FileSystemBase, IAsyncFileSystem, IFileSystem
     {
         private readonly IDictionary<FileSystemPath, LinkedList<FileSystemPath>> _directories;
         private readonly IDictionary<FileSystemPath, MemoryFile> _files;
@@ -56,10 +56,8 @@ namespace MobileDB.FileSystem
             };
         }
 
-        public async Task<IEnumerable<FileSystemPath>> GetEntities(FileSystemPath path, CancellationToken cancellationToken)
+        public ICollection<FileSystemPath> GetEntities(FileSystemPath path)
         {
-            await AwaitExtensions.SwitchOffMainThreadAsync(cancellationToken);
-
             if (!path.IsDirectory)
                 throw new ArgumentException("The specified path is no directory.", "path");
             LinkedList<FileSystemPath> subentities;
@@ -68,16 +66,13 @@ namespace MobileDB.FileSystem
             return subentities;
         }
 
-        public async Task<bool> Exists(FileSystemPath path, CancellationToken cancellationToken)
+        public bool Exists(FileSystemPath path)
         {
-            await AwaitExtensions.SwitchOffMainThreadAsync(cancellationToken);
             return path.IsDirectory ? _directories.ContainsKey(path) : _files.ContainsKey(path);
         }
 
-        public async Task<Stream> CreateFile(FileSystemPath path, CancellationToken cancellationToken)
+        public Stream CreateFile(FileSystemPath path)
         {
-            await AwaitExtensions.SwitchOffMainThreadAsync(cancellationToken);
-
             if (!path.IsFile)
                 throw new ArgumentException("The specified path is no file.", "path");
             if (!_directories.ContainsKey(path.ParentPath))
@@ -86,10 +81,8 @@ namespace MobileDB.FileSystem
             return new MemoryFileStream(_files[path] = new MemoryFile());
         }
 
-        public async Task<Stream> OpenFile(FileSystemPath path, DesiredFileAccess access, CancellationToken cancellationToken)
+        public Stream OpenFile(FileSystemPath path, DesiredFileAccess access)
         {
-            await AwaitExtensions.SwitchOffMainThreadAsync(cancellationToken);
-
             if (!path.IsFile)
                 throw new ArgumentException("The specified path is no file.", "path");
             MemoryFile file;
@@ -98,7 +91,60 @@ namespace MobileDB.FileSystem
             return new MemoryFileStream(file);
         }
 
-        public async Task CreateDirectory(FileSystemPath path, CancellationToken cancellationToken)
+        public void CreateDirectory(FileSystemPath path)
+        {
+            if (!path.IsDirectory)
+                throw new ArgumentException("The specified path is no directory.", "path");
+            LinkedList<FileSystemPath> subentities;
+            if (_directories.ContainsKey(path))
+                throw new ArgumentException("The specified directory-path already exists.", "path");
+            if (!_directories.TryGetValue(path.ParentPath, out subentities))
+                throw new DirectoryNotFoundException();
+            subentities.AddLast(path);
+            _directories[path] = new LinkedList<FileSystemPath>();
+        }
+
+        public void Delete(FileSystemPath path)
+        {
+            if (path.IsRoot)
+                throw new ArgumentException("The root cannot be deleted.");
+            bool removed;
+            if (path.IsDirectory)
+                removed = _directories.Remove(path);
+            else
+                removed = _files.Remove(path);
+            if (!removed)
+                throw new ArgumentException("The specified path does not exist.");
+            var parent = _directories[path.ParentPath];
+            parent.Remove(path);
+        }
+
+
+        public async Task<IEnumerable<FileSystemPath>> GetEntitiesAsync(FileSystemPath path, CancellationToken cancellationToken)
+        {
+            await AwaitExtensions.SwitchOffMainThreadAsync(cancellationToken);
+            return GetEntities(path);
+        }
+
+        public async Task<bool> ExistsAsync(FileSystemPath path, CancellationToken cancellationToken)
+        {
+            await AwaitExtensions.SwitchOffMainThreadAsync(cancellationToken);
+            return Exists(path);
+        }
+
+        public async Task<Stream> CreateFileAsync(FileSystemPath path, CancellationToken cancellationToken)
+        {
+            await AwaitExtensions.SwitchOffMainThreadAsync(cancellationToken);
+            return CreateFile(path);
+        }
+
+        public async Task<Stream> OpenFileAsync(FileSystemPath path, DesiredFileAccess access, CancellationToken cancellationToken)
+        {
+            await AwaitExtensions.SwitchOffMainThreadAsync(cancellationToken);
+            return OpenFile(path, access);
+        }
+
+        public async Task CreateDirectoryAsync(FileSystemPath path, CancellationToken cancellationToken)
         {
             await AwaitExtensions.SwitchOffMainThreadAsync(cancellationToken);
 
@@ -113,7 +159,7 @@ namespace MobileDB.FileSystem
             _directories[path] = new LinkedList<FileSystemPath>();
         }
 
-        public async Task Delete(FileSystemPath path, CancellationToken cancellationToken)
+        public async Task DeleteAsync(FileSystemPath path, CancellationToken cancellationToken)
         {
             await AwaitExtensions.SwitchOffMainThreadAsync(cancellationToken);
 

@@ -34,7 +34,7 @@ using MobileDB.FileSystem.Contracts;
 
 namespace MobileDB.FileSystem
 {
-    public class PhysicalFileSystem : FileSystemBase, IAsyncFileSystem
+    public class PhysicalFileSystem : FileSystemBase, IAsyncFileSystem, IFileSystem
     {
         public PhysicalFileSystem(ConnectionString connectionString)
             : base(connectionString)
@@ -50,63 +50,40 @@ namespace MobileDB.FileSystem
 
         public string PhysicalRoot { get; private set; }
 
-        public async Task<IEnumerable<FileSystemPath>> GetEntities(FileSystemPath path, CancellationToken cancellationToken)
+        public async Task<IEnumerable<FileSystemPath>> GetEntitiesAsync(FileSystemPath path, CancellationToken cancellationToken)
         {
             await AwaitExtensions.SwitchOffMainThreadAsync(cancellationToken);
-
-            var physicalPath = GetPhysicalPath(path);
-            var directories = Directory.GetDirectories(physicalPath);
-            var files = Directory.GetFiles(physicalPath);
-            var virtualDirectories =
-                directories.Select(GetVirtualDirectoryPath);
-            var virtualFiles =
-                files.Select(GetVirtualFilePath);
-            return new EnumerableCollection<FileSystemPath>(virtualDirectories.Concat(virtualFiles),
-                directories.Length + files.Length);
+            return GetEntities(path);
         }
 
-        public async Task<bool> Exists(FileSystemPath path, CancellationToken cancellationToken)
+        public async Task<bool> ExistsAsync(FileSystemPath path, CancellationToken cancellationToken)
         {
             await AwaitExtensions.SwitchOffMainThreadAsync(cancellationToken);
-
-            return path.IsFile ? File.Exists(GetPhysicalPath(path)) : Directory.Exists(GetPhysicalPath(path));
+            return Exists(path);
         }
 
-        public async Task<Stream> CreateFile(FileSystemPath path, CancellationToken cancellationToken)
+        public async Task<Stream> CreateFileAsync(FileSystemPath path, CancellationToken cancellationToken)
         {
             await AwaitExtensions.SwitchOffMainThreadAsync(cancellationToken);
-
-            if (!path.IsFile)
-                throw new ArgumentException("The specified path is not a file.", "path");
-            return File.Create(GetPhysicalPath(path));
+            return CreateFile(path);
         }
 
-        public async Task<Stream> OpenFile(FileSystemPath path, DesiredFileAccess access, CancellationToken cancellationToken)
+        public async Task<Stream> OpenFileAsync(FileSystemPath path, DesiredFileAccess access, CancellationToken cancellationToken)
         {
             await AwaitExtensions.SwitchOffMainThreadAsync(cancellationToken);
-
-            if (!path.IsFile)
-                throw new ArgumentException("The specified path is not a file.", "path");
-            return File.Open(GetPhysicalPath(path), FileMode.Open, access.ToFileAccess());
+            return OpenFile(path, access);
         }
 
-        public async Task CreateDirectory(FileSystemPath path, CancellationToken cancellationToken)
+        public async Task CreateDirectoryAsync(FileSystemPath path, CancellationToken cancellationToken)
         {
             await AwaitExtensions.SwitchOffMainThreadAsync(cancellationToken);
-
-            if (!path.IsDirectory)
-                throw new ArgumentException("The specified path is not a directory.", "path");
-            Directory.CreateDirectory(GetPhysicalPath(path));
+            CreateDirectory(path);
         }
 
-        public async Task Delete(FileSystemPath path, CancellationToken cancellationToken)
+        public async Task DeleteAsync(FileSystemPath path, CancellationToken cancellationToken)
         {
             await AwaitExtensions.SwitchOffMainThreadAsync(cancellationToken);
-
-            if (path.IsFile)
-                File.Delete(GetPhysicalPath(path));
-            else
-                Directory.Delete(GetPhysicalPath(path), true);
+            Delete(path);
         }
 
         public void Dispose()
@@ -139,6 +116,53 @@ namespace MobileDB.FileSystem
             if (virtualPath[virtualPath.Length - 1] != FileSystemPath.DirectorySeparator)
                 virtualPath += FileSystemPath.DirectorySeparator;
             return FileSystemPath.Parse(virtualPath);
+        }
+
+        public ICollection<FileSystemPath> GetEntities(FileSystemPath path)
+        {
+            var physicalPath = GetPhysicalPath(path);
+            var directories = Directory.GetDirectories(physicalPath);
+            var files = Directory.GetFiles(physicalPath);
+            var virtualDirectories =
+                directories.Select(GetVirtualDirectoryPath);
+            var virtualFiles =
+                files.Select(GetVirtualFilePath);
+            return new EnumerableCollection<FileSystemPath>(virtualDirectories.Concat(virtualFiles),
+                directories.Length + files.Length);
+        }
+
+        public bool Exists(FileSystemPath path)
+        {
+            return path.IsFile ? File.Exists(GetPhysicalPath(path)) : Directory.Exists(GetPhysicalPath(path));
+        }
+
+        public Stream CreateFile(FileSystemPath path)
+        {
+            if (!path.IsFile)
+                throw new ArgumentException("The specified path is not a file.", "path");
+            return File.Create(GetPhysicalPath(path));
+        }
+
+        public Stream OpenFile(FileSystemPath path, DesiredFileAccess access)
+        {
+            if (!path.IsFile)
+                throw new ArgumentException("The specified path is not a file.", "path");
+            return File.Open(GetPhysicalPath(path), FileMode.Open, access.ToFileAccess());
+        }
+
+        public void CreateDirectory(FileSystemPath path)
+        {
+            if (!path.IsDirectory)
+                throw new ArgumentException("The specified path is not a directory.", "path");
+            Directory.CreateDirectory(GetPhysicalPath(path));
+        }
+
+        public void Delete(FileSystemPath path)
+        {
+            if (path.IsFile)
+                File.Delete(GetPhysicalPath(path));
+            else
+                Directory.Delete(GetPhysicalPath(path), true);
         }
     }
 }

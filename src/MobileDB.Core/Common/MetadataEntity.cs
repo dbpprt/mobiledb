@@ -41,6 +41,9 @@ namespace MobileDB.Common
         [JsonProperty("metadata")]
         public Dictionary<string, string> Metadata { get; set; }
 
+        [JsonProperty("lastUpdate")]
+        public DateTime LastUpdated { get; set; }
+
         public object EntityOfType(Type type)
         {
             var jobj = Entity as JObject;

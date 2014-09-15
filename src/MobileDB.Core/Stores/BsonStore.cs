@@ -60,9 +60,9 @@ namespace MobileDB.Stores
 
         private async Task EnsureInitializedAsync()
         {
-            if (!await AsyncFileSystem.Exists(Path))
+            if (!await AsyncFileSystem.ExistsAsync(Path))
             {
-                await AsyncFileSystem.CreateDirectory(Path);
+                await AsyncFileSystem.CreateDirectoryAsync(Path);
             }
         }
 
@@ -84,18 +84,18 @@ namespace MobileDB.Stores
             switch (entityState)
             {
                 case EntityState.Deleted:
-                    await AsyncFileSystem.Delete(targetPath);
+                    await AsyncFileSystem.DeleteAsync(targetPath);
                     break;
 
                 case EntityState.Added:
                     var metadata = EntityMetadata(key, entity, EntityState.Added, null);
-                    using (var stream = await AsyncFileSystem.CreateFile(targetPath))
+                    using (var stream = await AsyncFileSystem.CreateFileAsync(targetPath))
                         Serialize(stream, metadata);
                     break;
 
                 case EntityState.Updated:
                     var updatedMetadata = EntityMetadata(key, entity, EntityState.Updated, await FindByIdInternalAsync(key));
-                    using (var stream = await AsyncFileSystem.CreateFile(targetPath))
+                    using (var stream = await AsyncFileSystem.CreateFileAsync(targetPath))
                         Serialize(stream, updatedMetadata);
                     break;
             }
@@ -172,7 +172,7 @@ namespace MobileDB.Stores
             {
                 await EnsureInitializedAsync();
 
-                return (await AsyncFileSystem.GetEntities(Path)).Count();
+                return (await AsyncFileSystem.GetEntitiesAsync(Path)).Count();
             }
         }
 
@@ -223,7 +223,7 @@ namespace MobileDB.Stores
             await EnsureInitializedAsync();
             var targetPath = Path.AppendFile(key.ToString());
 
-            using (var stream = await AsyncFileSystem.OpenFile(targetPath, DesiredFileAccess.Read))
+            using (var stream = await AsyncFileSystem.OpenFileAsync(targetPath, DesiredFileAccess.Read))
                 return Deserialize(stream);
         }
 

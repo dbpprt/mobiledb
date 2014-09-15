@@ -116,13 +116,13 @@ namespace MobileDB.Stores.Json
 
             using (_lock.WriteLock())
             {
-                if (!await AsyncFileSystem.Exists(Path))
+                if (!await AsyncFileSystem.ExistsAsync(Path))
                 {
                     _initialized = true;
                     return;
                 }
 
-                using (var stream = await AsyncFileSystem.OpenFile(Path, DesiredFileAccess.Read))
+                using (var stream = await AsyncFileSystem.OpenFileAsync(Path, DesiredFileAccess.Read))
                 using (var instream = new StreamReader(stream))
                 {
                     var json = "[" + instream.ReadToEnd().Replace(Environment.NewLine, ",") + "]";
@@ -201,7 +201,7 @@ namespace MobileDB.Stores.Json
 
         private async Task FlushAsync(List<MetadataEntity> raw)
         {
-            using (var stream = await AsyncFileSystem.CreateFile(Path))
+            using (var stream = await AsyncFileSystem.CreateFileAsync(Path))
             using (var outstream = new StreamWriter(stream))
             {
                 var writer = new JsonTextWriter(outstream);
