@@ -1,4 +1,5 @@
 #region Copyright (C) 2014 Dennis Bappert
+
 // The MIT License (MIT)
 
 // Copyright (c) 2014 Dennis Bappert
@@ -20,6 +21,7 @@
 // LIABILITY, WHETHER IN AN ACTION OF CONTRACT, TORT OR OTHERWISE, ARISING FROM,
 // OUT OF OR IN CONNECTION WITH THE SOFTWARE OR THE USE OR OTHER DEALINGS IN THE
 // SOFTWARE.
+
 #endregion
 
 using System.Reflection;
@@ -30,7 +32,7 @@ namespace MobileDB.Tests.Common
     {
         public static void ClearInternalContextCaches()
         {
-            var type = typeof(DbContextBase);
+            var type = typeof (DbContextBase);
             var cacheField = type.GetField("CachedContextConfigurations", BindingFlags.NonPublic | BindingFlags.Static);
             var cache = cacheField.GetValue(null);
             cache.GetType().GetMethod("Clear").Invoke(cache, null);

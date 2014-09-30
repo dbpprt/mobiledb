@@ -1,4 +1,5 @@
 #region Copyright (C) 2014 Dennis Bappert
+
 // The MIT License (MIT)
 
 // Copyright (c) 2014 Dennis Bappert
@@ -20,6 +21,7 @@
 // LIABILITY, WHETHER IN AN ACTION OF CONTRACT, TORT OR OTHERWISE, ARISING FROM,
 // OUT OF OR IN CONNECTION WITH THE SOFTWARE OR THE USE OR OTHER DEALINGS IN THE
 // SOFTWARE.
+
 #endregion
 
 using System;
@@ -34,12 +36,6 @@ namespace MobileDB.Common.Factory
         public Builder(Dictionary<string, string> tuples)
         {
             _tuples = tuples;
-        }
-
-        public T Build()
-        {
-            var connectionString = ConnectionString;
-            return (T) Activator.CreateInstance(typeof (T), connectionString);
         }
 
         public string ConnectionString
@@ -60,6 +56,12 @@ namespace MobileDB.Common.Factory
                     segments);
                 return connectionString;
             }
+        }
+
+        public T Build()
+        {
+            var connectionString = ConnectionString;
+            return (T) Activator.CreateInstance(typeof (T), connectionString);
         }
     }
 }

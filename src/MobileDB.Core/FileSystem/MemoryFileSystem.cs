@@ -1,4 +1,5 @@
 #region Copyright (C) 2014 Dennis Bappert
+
 // The MIT License (MIT)
 
 // Copyright (c) 2014 Dennis Bappert
@@ -20,6 +21,7 @@
 // LIABILITY, WHETHER IN AN ACTION OF CONTRACT, TORT OR OTHERWISE, ARISING FROM,
 // OUT OF OR IN CONNECTION WITH THE SOFTWARE OR THE USE OR OTHER DEALINGS IN THE
 // SOFTWARE.
+
 #endregion
 
 using System;
@@ -54,6 +56,69 @@ namespace MobileDB.FileSystem
                     new LinkedList<FileSystemPath>()
                 }
             };
+        }
+
+
+        public async Task<IEnumerable<FileSystemPath>> GetEntitiesAsync(FileSystemPath path,
+            CancellationToken cancellationToken)
+        {
+            await AwaitExtensions.SwitchOffMainThreadAsync(cancellationToken);
+            return GetEntities(path);
+        }
+
+        public async Task<bool> ExistsAsync(FileSystemPath path, CancellationToken cancellationToken)
+        {
+            await AwaitExtensions.SwitchOffMainThreadAsync(cancellationToken);
+            return Exists(path);
+        }
+
+        public async Task<Stream> CreateFileAsync(FileSystemPath path, CancellationToken cancellationToken)
+        {
+            await AwaitExtensions.SwitchOffMainThreadAsync(cancellationToken);
+            return CreateFile(path);
+        }
+
+        public async Task<Stream> OpenFileAsync(FileSystemPath path, DesiredFileAccess access,
+            CancellationToken cancellationToken)
+        {
+            await AwaitExtensions.SwitchOffMainThreadAsync(cancellationToken);
+            return OpenFile(path, access);
+        }
+
+        public async Task CreateDirectoryAsync(FileSystemPath path, CancellationToken cancellationToken)
+        {
+            await AwaitExtensions.SwitchOffMainThreadAsync(cancellationToken);
+
+            if (!path.IsDirectory)
+                throw new ArgumentException("The specified path is no directory.", "path");
+            LinkedList<FileSystemPath> subentities;
+            if (_directories.ContainsKey(path))
+                throw new ArgumentException("The specified directory-path already exists.", "path");
+            if (!_directories.TryGetValue(path.ParentPath, out subentities))
+                throw new DirectoryNotFoundException();
+            subentities.AddLast(path);
+            _directories[path] = new LinkedList<FileSystemPath>();
+        }
+
+        public async Task DeleteAsync(FileSystemPath path, CancellationToken cancellationToken)
+        {
+            await AwaitExtensions.SwitchOffMainThreadAsync(cancellationToken);
+
+            if (path.IsRoot)
+                throw new ArgumentException("The root cannot be deleted.");
+            bool removed;
+            if (path.IsDirectory)
+                removed = _directories.Remove(path);
+            else
+                removed = _files.Remove(path);
+            if (!removed)
+                throw new ArgumentException("The specified path does not exist.");
+            var parent = _directories[path.ParentPath];
+            parent.Remove(path);
+        }
+
+        public void Dispose()
+        {
         }
 
         public ICollection<FileSystemPath> GetEntities(FileSystemPath path)
@@ -117,67 +182,6 @@ namespace MobileDB.FileSystem
                 throw new ArgumentException("The specified path does not exist.");
             var parent = _directories[path.ParentPath];
             parent.Remove(path);
-        }
-
-
-        public async Task<IEnumerable<FileSystemPath>> GetEntitiesAsync(FileSystemPath path, CancellationToken cancellationToken)
-        {
-            await AwaitExtensions.SwitchOffMainThreadAsync(cancellationToken);
-            return GetEntities(path);
-        }
-
-        public async Task<bool> ExistsAsync(FileSystemPath path, CancellationToken cancellationToken)
-        {
-            await AwaitExtensions.SwitchOffMainThreadAsync(cancellationToken);
-            return Exists(path);
-        }
-
-        public async Task<Stream> CreateFileAsync(FileSystemPath path, CancellationToken cancellationToken)
-        {
-            await AwaitExtensions.SwitchOffMainThreadAsync(cancellationToken);
-            return CreateFile(path);
-        }
-
-        public async Task<Stream> OpenFileAsync(FileSystemPath path, DesiredFileAccess access, CancellationToken cancellationToken)
-        {
-            await AwaitExtensions.SwitchOffMainThreadAsync(cancellationToken);
-            return OpenFile(path, access);
-        }
-
-        public async Task CreateDirectoryAsync(FileSystemPath path, CancellationToken cancellationToken)
-        {
-            await AwaitExtensions.SwitchOffMainThreadAsync(cancellationToken);
-
-            if (!path.IsDirectory)
-                throw new ArgumentException("The specified path is no directory.", "path");
-            LinkedList<FileSystemPath> subentities;
-            if (_directories.ContainsKey(path))
-                throw new ArgumentException("The specified directory-path already exists.", "path");
-            if (!_directories.TryGetValue(path.ParentPath, out subentities))
-                throw new DirectoryNotFoundException();
-            subentities.AddLast(path);
-            _directories[path] = new LinkedList<FileSystemPath>();
-        }
-
-        public async Task DeleteAsync(FileSystemPath path, CancellationToken cancellationToken)
-        {
-            await AwaitExtensions.SwitchOffMainThreadAsync(cancellationToken);
-
-            if (path.IsRoot)
-                throw new ArgumentException("The root cannot be deleted.");
-            bool removed;
-            if (path.IsDirectory)
-                removed = _directories.Remove(path);
-            else
-                removed = _files.Remove(path);
-            if (!removed)
-                throw new ArgumentException("The specified path does not exist.");
-            var parent = _directories[path.ParentPath];
-            parent.Remove(path);
-        }
-
-        public void Dispose()
-        {
         }
 
         public class MemoryFile

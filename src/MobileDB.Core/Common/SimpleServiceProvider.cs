@@ -1,4 +1,5 @@
 #region Copyright (C) 2014 Dennis Bappert
+
 // The MIT License (MIT)
 
 // Copyright (c) 2014 Dennis Bappert
@@ -20,6 +21,7 @@
 // LIABILITY, WHETHER IN AN ACTION OF CONTRACT, TORT OR OTHERWISE, ARISING FROM,
 // OUT OF OR IN CONNECTION WITH THE SOFTWARE OR THE USE OR OTHER DEALINGS IN THE
 // SOFTWARE.
+
 #endregion
 
 using System;
@@ -33,6 +35,23 @@ namespace MobileDB.Common
     {
         private readonly Dictionary<Type, Func<object>> _registrations =
             new Dictionary<Type, Func<object>>();
+
+        public object GetService(Type serviceType)
+        {
+            Func<object> creator;
+            if (!_registrations.TryGetValue(serviceType, out creator))
+            {
+                if (!serviceType.GetTypeInfo().IsAbstract)
+                {
+                    return CreateConcreteType(serviceType);
+                }
+
+                throw new InvalidOperationException(
+                    "No registration for " + serviceType);
+            }
+
+            return creator.Invoke();
+        }
 
         public void Register<TService, TImplementation>()
             where TImplementation : TService
@@ -48,7 +67,7 @@ namespace MobileDB.Common
 
         public void Register<TService>()
         {
-            _registrations.Add(typeof(TService),
+            _registrations.Add(typeof (TService),
                 () => GetInstance<TService>());
         }
 
@@ -66,23 +85,6 @@ namespace MobileDB.Common
         public TService GetInstance<TService>()
         {
             return (TService) GetService(typeof (TService));
-        }
-
-        public object GetService(Type serviceType)
-        {
-            Func<object> creator;
-            if (!_registrations.TryGetValue(serviceType, out creator))
-            {
-                if (!serviceType.GetTypeInfo().IsAbstract)
-                {
-                    return CreateConcreteType(serviceType);
-                }
-
-                throw new InvalidOperationException(
-                    "No registration for " + serviceType);
-            }
-
-            return creator.Invoke();
         }
 
         private object CreateConcreteType(Type implementationType)

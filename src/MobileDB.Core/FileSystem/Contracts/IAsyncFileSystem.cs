@@ -1,4 +1,5 @@
 #region Copyright (C) 2014 Dennis Bappert
+
 // The MIT License (MIT)
 
 // Copyright (c) 2014 Dennis Bappert
@@ -20,13 +21,12 @@
 // LIABILITY, WHETHER IN AN ACTION OF CONTRACT, TORT OR OTHERWISE, ARISING FROM,
 // OUT OF OR IN CONNECTION WITH THE SOFTWARE OR THE USE OR OTHER DEALINGS IN THE
 // SOFTWARE.
+
 #endregion
 
 using System;
 using System.Collections.Generic;
 using System.IO;
-using System.Linq;
-using System.Text;
 using System.Threading;
 using System.Threading.Tasks;
 
@@ -34,13 +34,16 @@ namespace MobileDB.FileSystem.Contracts
 {
     public interface IAsyncFileSystem : IDisposable
     {
-        Task<IEnumerable<FileSystemPath>> GetEntitiesAsync(FileSystemPath path, CancellationToken cancellationToken = default(CancellationToken));
+        Task<IEnumerable<FileSystemPath>> GetEntitiesAsync(FileSystemPath path,
+            CancellationToken cancellationToken = default(CancellationToken));
 
         Task<bool> ExistsAsync(FileSystemPath path, CancellationToken cancellationToken = default(CancellationToken));
 
-        Task<Stream> CreateFileAsync(FileSystemPath path, CancellationToken cancellationToken = default(CancellationToken));
+        Task<Stream> CreateFileAsync(FileSystemPath path,
+            CancellationToken cancellationToken = default(CancellationToken));
 
-        Task<Stream> OpenFileAsync(FileSystemPath path, DesiredFileAccess access, CancellationToken cancellationToken = default(CancellationToken));
+        Task<Stream> OpenFileAsync(FileSystemPath path, DesiredFileAccess access,
+            CancellationToken cancellationToken = default(CancellationToken));
 
         Task CreateDirectoryAsync(FileSystemPath path, CancellationToken cancellationToken = default(CancellationToken));
 

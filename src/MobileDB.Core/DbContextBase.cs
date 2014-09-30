@@ -1,4 +1,5 @@
 #region Copyright (C) 2014 Dennis Bappert
+
 // The MIT License (MIT)
 
 // Copyright (c) 2014 Dennis Bappert
@@ -20,6 +21,7 @@
 // LIABILITY, WHETHER IN AN ACTION OF CONTRACT, TORT OR OTHERWISE, ARISING FROM,
 // OUT OF OR IN CONNECTION WITH THE SOFTWARE OR THE USE OR OTHER DEALINGS IN THE
 // SOFTWARE.
+
 #endregion
 
 using System;
@@ -30,11 +32,8 @@ using System.Threading;
 using System.Threading.Tasks;
 using MobileDB.Common;
 using MobileDB.Common.Attributes;
-using MobileDB.Common.Utilities;
-using MobileDB.Common.Validation;
 using MobileDB.Contracts;
 using MobileDB.Exceptions;
-using MobileDB.FileSystem;
 using MobileDB.FileSystem.Contracts;
 using MobileDB.Stores;
 using MobileDB.Stores.Json;
@@ -47,12 +46,6 @@ namespace MobileDB
         private static readonly ReaderWriterLockSlim Lock;
         private readonly Dictionary<EntityConfiguration, ChangeSet> _changeTracker;
         private readonly Dictionary<Type, object> _setInstances;
-
-        public bool ValidateEntities { get; protected set; }
-        public ConnectionString ConnectionString { get; private set; }
-        public FileSystemBase FileSystem { get; private set; }
-
-        private IServiceProvider ServiceProvider { get; set; }
 
         static DbContextBase()
         {
@@ -81,14 +74,20 @@ namespace MobileDB
             FileSystem = contextConfiguration.FileSystem;
         }
 
+        public bool ValidateEntities { get; protected set; }
+        public ConnectionString ConnectionString { get; private set; }
+        public FileSystemBase FileSystem { get; private set; }
+
+        private IServiceProvider ServiceProvider { get; set; }
+
 
         public int SaveChanges()
         {
             var changedEntities =
                 (from trackedChangeSet in _changeTracker
-                 let configuration = trackedChangeSet.Key
-                 let changeset = trackedChangeSet.Value
-                 select configuration.EntityStore.SaveChanges(changeset)).Sum();
+                    let configuration = trackedChangeSet.Key
+                    let changeset = trackedChangeSet.Value
+                    select configuration.EntityStore.SaveChanges(changeset)).Sum();
 
             foreach (var trackedChangeSet in _changeTracker)
             {
@@ -104,9 +103,9 @@ namespace MobileDB
             // and im not quite sure wether everything is threadsafe behind the scenes
             var tasks =
                 (from trackedChangeSet in _changeTracker
-                 let configuration = trackedChangeSet.Key
-                 let changeset = trackedChangeSet.Value
-                 select configuration.EntityStore.SaveChangesAsync(changeset));
+                    let configuration = trackedChangeSet.Key
+                    let changeset = trackedChangeSet.Value
+                    select configuration.EntityStore.SaveChangesAsync(changeset));
             var changedEntities = await Task.WhenAll(tasks).ContinueWith(task => task.Result.Sum());
 
             foreach (var trackedChangeSet in _changeTracker)
@@ -119,7 +118,7 @@ namespace MobileDB
 
         public IEntitySet<T> Set<T>() where T : new()
         {
-            return Set(typeof(T)) as IEntitySet<T>;
+            return Set(typeof (T)) as IEntitySet<T>;
         }
 
         public object Set(Type entityType)
@@ -134,7 +133,7 @@ namespace MobileDB
             var fileSystemTypeName = ConnectionString.GetPart(ConnectionStringConstants.Filesystem);
 
             var fileSystemType = MobileDB.FileSystems().FirstOrDefault(_ => _.FullName == fileSystemTypeName);
-           
+
             if (fileSystemType == null)
             {
                 throw new InvalidProviderException("The requested filesystem was not found",
@@ -159,22 +158,22 @@ namespace MobileDB
             // only god and i understood what i was doing
             configuration.EntityConfigurations =
                 (from propertyInfo in GetType().GetRuntimeProperties()
-                 let propertyType = propertyInfo.PropertyType
-                 let genericTypeArgument = propertyType.GenericTypeArguments.FirstOrDefault()
-                 where genericTypeArgument != null
-                 let genericInterface = typeof(IEntitySet<>).MakeGenericType(genericTypeArgument)
-                 where genericInterface.GetTypeInfo().IsAssignableFrom(propertyType.GetTypeInfo())
-                 let storeAttribute = propertyInfo.GetCustomAttribute<StoreAttribute>()
-                 let storeType = storeAttribute != null ? storeAttribute.StoreType : typeof(JsonStore)
-                 let storeInstance = Activator.CreateInstance(storeType, fileSystem, genericTypeArgument)
-                 let setType = typeof(EntitySet<>).MakeGenericType(genericTypeArgument)
-                 select new EntityConfiguration
-                 {
-                     EntityStore = storeInstance as StoreBase,
-                     EntityType = genericTypeArgument,
-                     PropertyInfo = propertyInfo,
-                     EntitySetType = setType
-                 }).ToList();
+                    let propertyType = propertyInfo.PropertyType
+                    let genericTypeArgument = propertyType.GenericTypeArguments.FirstOrDefault()
+                    where genericTypeArgument != null
+                    let genericInterface = typeof (IEntitySet<>).MakeGenericType(genericTypeArgument)
+                    where genericInterface.GetTypeInfo().IsAssignableFrom(propertyType.GetTypeInfo())
+                    let storeAttribute = propertyInfo.GetCustomAttribute<StoreAttribute>()
+                    let storeType = storeAttribute != null ? storeAttribute.StoreType : typeof (JsonStore)
+                    let storeInstance = Activator.CreateInstance(storeType, fileSystem, genericTypeArgument)
+                    let setType = typeof (EntitySet<>).MakeGenericType(genericTypeArgument)
+                    select new EntityConfiguration
+                    {
+                        EntityStore = storeInstance as StoreBase,
+                        EntityType = genericTypeArgument,
+                        PropertyInfo = propertyInfo,
+                        EntitySetType = setType
+                    }).ToList();
 
             return configuration;
         }

@@ -10,7 +10,7 @@ properties {
 	$nuget_path = "$base_dir\.nuget\NuGet.exe"
 	
     $environment = ""   
-	$revision = "9"    
+	$revision = "9.1"    
 	$version = "0.0." 
 	
     $header = "$base_dir\header-mit.txt"

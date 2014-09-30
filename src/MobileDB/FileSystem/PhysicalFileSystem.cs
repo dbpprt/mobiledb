@@ -1,4 +1,5 @@
 #region Copyright (C) 2014 Dennis Bappert
+
 // The MIT License (MIT)
 
 // Copyright (c) 2014 Dennis Bappert
@@ -20,6 +21,7 @@
 // LIABILITY, WHETHER IN AN ACTION OF CONTRACT, TORT OR OTHERWISE, ARISING FROM,
 // OUT OF OR IN CONNECTION WITH THE SOFTWARE OR THE USE OR OTHER DEALINGS IN THE
 // SOFTWARE.
+
 #endregion
 
 using System;
@@ -50,7 +52,8 @@ namespace MobileDB.FileSystem
 
         public string PhysicalRoot { get; private set; }
 
-        public async Task<IEnumerable<FileSystemPath>> GetEntitiesAsync(FileSystemPath path, CancellationToken cancellationToken)
+        public async Task<IEnumerable<FileSystemPath>> GetEntitiesAsync(FileSystemPath path,
+            CancellationToken cancellationToken)
         {
             await AwaitExtensions.SwitchOffMainThreadAsync(cancellationToken);
             return GetEntities(path);
@@ -68,7 +71,8 @@ namespace MobileDB.FileSystem
             return CreateFile(path);
         }
 
-        public async Task<Stream> OpenFileAsync(FileSystemPath path, DesiredFileAccess access, CancellationToken cancellationToken)
+        public async Task<Stream> OpenFileAsync(FileSystemPath path, DesiredFileAccess access,
+            CancellationToken cancellationToken)
         {
             await AwaitExtensions.SwitchOffMainThreadAsync(cancellationToken);
             return OpenFile(path, access);
@@ -88,34 +92,6 @@ namespace MobileDB.FileSystem
 
         public void Dispose()
         {
-        }
-
-        public string GetPhysicalPath(FileSystemPath path)
-        {
-            return Path.Combine(PhysicalRoot,
-                path.ToString().Remove(0, 1).Replace(FileSystemPath.DirectorySeparator, Path.DirectorySeparatorChar));
-        }
-
-        public FileSystemPath GetVirtualFilePath(string physicalPath)
-        {
-            if (!physicalPath.StartsWith(PhysicalRoot, StringComparison.InvariantCultureIgnoreCase))
-                throw new ArgumentException("The specified path is not member of the PhysicalRoot.", "physicalPath");
-            var virtualPath = FileSystemPath.DirectorySeparator +
-                              physicalPath.Remove(0, PhysicalRoot.Length)
-                                  .Replace(Path.DirectorySeparatorChar, FileSystemPath.DirectorySeparator);
-            return FileSystemPath.Parse(virtualPath);
-        }
-
-        public FileSystemPath GetVirtualDirectoryPath(string physicalPath)
-        {
-            if (!physicalPath.StartsWith(PhysicalRoot, StringComparison.InvariantCultureIgnoreCase))
-                throw new ArgumentException("The specified path is not member of the PhysicalRoot.", "physicalPath");
-            var virtualPath = FileSystemPath.DirectorySeparator +
-                              physicalPath.Remove(0, PhysicalRoot.Length)
-                                  .Replace(Path.DirectorySeparatorChar, FileSystemPath.DirectorySeparator);
-            if (virtualPath[virtualPath.Length - 1] != FileSystemPath.DirectorySeparator)
-                virtualPath += FileSystemPath.DirectorySeparator;
-            return FileSystemPath.Parse(virtualPath);
         }
 
         public ICollection<FileSystemPath> GetEntities(FileSystemPath path)
@@ -163,6 +139,34 @@ namespace MobileDB.FileSystem
                 File.Delete(GetPhysicalPath(path));
             else
                 Directory.Delete(GetPhysicalPath(path), true);
+        }
+
+        public string GetPhysicalPath(FileSystemPath path)
+        {
+            return Path.Combine(PhysicalRoot,
+                path.ToString().Remove(0, 1).Replace(FileSystemPath.DirectorySeparator, Path.DirectorySeparatorChar));
+        }
+
+        public FileSystemPath GetVirtualFilePath(string physicalPath)
+        {
+            if (!physicalPath.StartsWith(PhysicalRoot, StringComparison.InvariantCultureIgnoreCase))
+                throw new ArgumentException("The specified path is not member of the PhysicalRoot.", "physicalPath");
+            var virtualPath = FileSystemPath.DirectorySeparator +
+                              physicalPath.Remove(0, PhysicalRoot.Length)
+                                  .Replace(Path.DirectorySeparatorChar, FileSystemPath.DirectorySeparator);
+            return FileSystemPath.Parse(virtualPath);
+        }
+
+        public FileSystemPath GetVirtualDirectoryPath(string physicalPath)
+        {
+            if (!physicalPath.StartsWith(PhysicalRoot, StringComparison.InvariantCultureIgnoreCase))
+                throw new ArgumentException("The specified path is not member of the PhysicalRoot.", "physicalPath");
+            var virtualPath = FileSystemPath.DirectorySeparator +
+                              physicalPath.Remove(0, PhysicalRoot.Length)
+                                  .Replace(Path.DirectorySeparatorChar, FileSystemPath.DirectorySeparator);
+            if (virtualPath[virtualPath.Length - 1] != FileSystemPath.DirectorySeparator)
+                virtualPath += FileSystemPath.DirectorySeparator;
+            return FileSystemPath.Parse(virtualPath);
         }
     }
 }

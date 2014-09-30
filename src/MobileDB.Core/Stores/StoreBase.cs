@@ -1,4 +1,5 @@
 #region Copyright (C) 2014 Dennis Bappert
+
 // The MIT License (MIT)
 
 // Copyright (c) 2014 Dennis Bappert
@@ -20,6 +21,7 @@
 // LIABILITY, WHETHER IN AN ACTION OF CONTRACT, TORT OR OTHERWISE, ARISING FROM,
 // OUT OF OR IN CONNECTION WITH THE SOFTWARE OR THE USE OR OTHER DEALINGS IN THE
 // SOFTWARE.
+
 #endregion
 
 using System;
@@ -34,6 +36,20 @@ namespace MobileDB.Stores
 {
     public abstract class StoreBase : IStore
     {
+        private readonly IAsyncFileSystem _asyncFileSystem;
+        private readonly Type _entityType;
+        private readonly IFileSystem _fileSystem;
+
+        public StoreBase(
+            FileSystemBase fileSystem,
+            Type entityType)
+        {
+            _entityType = entityType;
+
+            _asyncFileSystem = fileSystem as IAsyncFileSystem;
+            _fileSystem = fileSystem as IFileSystem;
+        }
+
         protected IFileSystem FileSystem
         {
             get
@@ -52,21 +68,6 @@ namespace MobileDB.Stores
                     throw new NotSupportedException("The loaded filesystem doesnt support async access!");
                 return _asyncFileSystem;
             }
-        }
-
-        private readonly Type _entityType;
-        private readonly IAsyncFileSystem _asyncFileSystem;
-        private readonly IFileSystem _fileSystem;
-
-        public StoreBase(
-            FileSystemBase fileSystem,
-            Type entityType)
-        {
-            _entityType = entityType;
-
-            _asyncFileSystem = fileSystem as IAsyncFileSystem;
-            _fileSystem = fileSystem as IFileSystem;
-
         }
 
         protected Type EntityType

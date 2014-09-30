@@ -1,4 +1,5 @@
 #region Copyright (C) 2014 Dennis Bappert
+
 // The MIT License (MIT)
 
 // Copyright (c) 2014 Dennis Bappert
@@ -20,6 +21,7 @@
 // LIABILITY, WHETHER IN AN ACTION OF CONTRACT, TORT OR OTHERWISE, ARISING FROM,
 // OUT OF OR IN CONNECTION WITH THE SOFTWARE OR THE USE OR OTHER DEALINGS IN THE
 // SOFTWARE.
+
 #endregion
 
 using System;
@@ -29,12 +31,12 @@ using System.Threading.Tasks;
 
 namespace MobileDB.Common.Utilities
 {
-    public static partial class AwaitExtensions
+    public static class AwaitExtensions
     {
         /// <summary>
-        /// Causes the caller who awaits this method to
-        /// switch off the Main thread. It has no effect if
-        /// the caller is already off the main thread.
+        ///     Causes the caller who awaits this method to
+        ///     switch off the Main thread. It has no effect if
+        ///     the caller is already off the main thread.
         /// </summary>
         /// <param name="cancellationToken">The cancellation token.</param>
         /// <returns>An awaitable that does the thread switching magic.</returns>
@@ -57,11 +59,6 @@ namespace MobileDB.Common.Utilities
                 _cancellationToken = cancellationToken;
             }
 
-            public TaskSchedulerAwaiter GetAwaiter()
-            {
-                return this;
-            }
-
             public bool IsCompleted
             {
                 get { return _taskScheduler == null; }
@@ -78,7 +75,12 @@ namespace MobileDB.Common.Utilities
                     continuation,
                     CancellationToken.None,
                     TaskCreationOptions.None,
-                    this._taskScheduler);
+                    _taskScheduler);
+            }
+
+            public TaskSchedulerAwaiter GetAwaiter()
+            {
+                return this;
             }
 
             public void GetResult()

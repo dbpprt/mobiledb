@@ -1,4 +1,5 @@
 #region Copyright (C) 2014 Dennis Bappert
+
 // The MIT License (MIT)
 
 // Copyright (c) 2014 Dennis Bappert
@@ -20,13 +21,14 @@
 // LIABILITY, WHETHER IN AN ACTION OF CONTRACT, TORT OR OTHERWISE, ARISING FROM,
 // OUT OF OR IN CONNECTION WITH THE SOFTWARE OR THE USE OR OTHER DEALINGS IN THE
 // SOFTWARE.
+
 #endregion
 
 namespace MobileDB
 {
     public class DbContext : DbContextBase
     {
-        public DbContext(string nameOrConnectionString) 
+        public DbContext(string nameOrConnectionString)
             : base(new ConfigConnectionString(nameOrConnectionString))
         {
         }

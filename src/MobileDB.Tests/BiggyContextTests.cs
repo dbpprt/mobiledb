@@ -1,4 +1,5 @@
 #region Copyright (C) 2014 Dennis Bappert
+
 // The MIT License (MIT)
 
 // Copyright (c) 2014 Dennis Bappert
@@ -20,6 +21,7 @@
 // LIABILITY, WHETHER IN AN ACTION OF CONTRACT, TORT OR OTHERWISE, ARISING FROM,
 // OUT OF OR IN CONNECTION WITH THE SOFTWARE OR THE USE OR OTHER DEALINGS IN THE
 // SOFTWARE.
+
 #endregion
 
 using System;
@@ -72,7 +74,7 @@ namespace MobileDB.Tests
                 .Build();
             var secondElapsed = stopwatch.ElapsedTicks;
 
-            var factor = firstElapsed / secondElapsed;
+            var factor = firstElapsed/secondElapsed;
 
             // TODO: 1000 is the expected factor, but test conditions arent good
             // okay that's a lie => ClearInternalContextCaches is broken ^^
@@ -99,7 +101,7 @@ namespace MobileDB.Tests
                 .WithMemoryFilesystem()
                 .Build();
 
-            var set = context.Set(typeof(SimpleEntityWithIdentity));
+            var set = context.Set(typeof (SimpleEntityWithIdentity));
 
             Assert.NotNull(set);
         }

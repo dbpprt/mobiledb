@@ -2,7 +2,7 @@
 <package >
   <metadata>
     <id>MobileDB</id>
-    <version>0.0.9-alpha</version>
+    <version>0.0.9-alpha2</version>
     <authors>Dennis Bappert</authors>
     <owners>Dennis Bappert</owners>
     <licenseUrl>https://github.com/flumbee/mobiledb/blob/master/LICENSE</licenseUrl>
@@ -10,7 +10,7 @@
     <requireLicenseAcceptance>false</requireLicenseAcceptance>
     <description>You like EntityFramework and use it frequently but sometimes you need just a simple embedded database for an app or a small application, then MobileDB ist just right for you. It's a lightweight, fast and simple JSON database with an EntityFramework inspired API.
 	</description>
-    <releaseNotes>Initial nuget release. Visit project site for more information.</releaseNotes>
+    <releaseNotes>Fixed some bugs. This release should be usable for small projects.</releaseNotes>
     <copyright>Copyright 2014</copyright>
     <tags>database json entityframework embedded</tags>
 	<dependencies>
