@@ -5,6 +5,7 @@ You like **EntityFramework's** API and the way of accessing tables and save data
 ### Features ###
 
 - **Full LINQ support**
+- (**new**) async support
 - Super-Fast data-access with a **Json**-Store (in-memory dataset synchronized with your underlaying filesystem)
 - A **Bson**-Store for saving files with metadata (not kept in-memory - loaded on demand)
 - EntityFramework inspired DbContext and EntitySets
@@ -130,7 +131,6 @@ public IEntitySet<SimpleEntityWithIdentity> Movies { get; set; }
 
 ### Known bugs :( ###
 
-- Async functions are'nt implemented yet
 - FileSystem implementation for Windows Phone (LocalStorage) is missing
 - Test coverage is about 1%
 
