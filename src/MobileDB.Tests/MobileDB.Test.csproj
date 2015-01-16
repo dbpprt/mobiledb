@@ -61,13 +61,14 @@
     </Otherwise>
   </Choose>
   <ItemGroup>
-    <Compile Include="Builder\BuilderTest.cs" />
+    <Compile Include="BuilderTests.cs" />
     <Compile Include="Common\ContextWithSimpleIdentity.cs" />
     <Compile Include="Common\BsonContextWithSimpleIdentity.cs" />
     <Compile Include="Common\JsonContextWithSimpleIdentity.cs" />
     <Compile Include="Common\ReflectionHelper.cs" />
     <Compile Include="Common\SimpleEntityWithIdentity.cs" />
     <Compile Include="BiggyContextTests.cs" />
+    <Compile Include="ConnectionStringTests.cs" />
     <Compile Include="EntityValidationTests.cs" />
     <Compile Include="BsonStoreTests.cs" />
     <Compile Include="JsonStoreTests.cs" />

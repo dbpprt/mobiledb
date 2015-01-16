@@ -8,11 +8,11 @@ using Xunit;
 
 namespace MobileDB.Tests.Builder
 {
-    public class BuilderTest
+    public class BuilderTests
     {
-        private Builder<BsonContextWithSimpleIdentity> _contextBuilder;
+        private readonly Builder<BsonContextWithSimpleIdentity> _contextBuilder;
 
-        public BuilderTest()
+        public BuilderTests()
         {
             const string databasePath = @"C:\Development\database";
             var contextBuilder = new Dictionary<string, string>
@@ -45,5 +45,6 @@ namespace MobileDB.Tests.Builder
             instance.Should().NotBeNull();
             instance.Should().BeOfType<BsonContextWithSimpleIdentity>();
         }
+
     }
 }
