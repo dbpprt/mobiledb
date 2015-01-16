@@ -68,6 +68,7 @@
     <Compile Include="Common\ReflectionHelper.cs" />
     <Compile Include="Common\SimpleEntityWithIdentity.cs" />
     <Compile Include="BiggyContextTests.cs" />
+    <Compile Include="ConnectionStringConstantsTests.cs" />
     <Compile Include="ConnectionStringTests.cs" />
     <Compile Include="EntityValidationTests.cs" />
     <Compile Include="BsonStoreTests.cs" />
