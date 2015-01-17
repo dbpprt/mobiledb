@@ -36,9 +36,7 @@ namespace MobileDB.Common
         private readonly string _connectionString;
         private readonly Dictionary<string, string> _connectionStringTuples;
 
-        public ConnectionString(
-            string connectionString
-            )
+        public ConnectionString(string connectionString)
         {
             _connectionString = connectionString;
 

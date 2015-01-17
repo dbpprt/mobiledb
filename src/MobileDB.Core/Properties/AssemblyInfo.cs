@@ -25,6 +25,8 @@
 #endregion
 
 using System.Reflection;
+using System.Runtime.CompilerServices;
 
 [assembly: AssemblyTitle("MobileDB.Core")]
 [assembly: AssemblyDescription("MobileDB's core library containing all the OS independant logic.")]
+[assembly: InternalsVisibleTo("MobileDB.Tests")]

@@ -26,6 +26,7 @@
 
 using System;
 using System.Collections.Generic;
+using System.Linq;
 
 namespace MobileDB.Common.Factory
 {
@@ -42,18 +43,13 @@ namespace MobileDB.Common.Factory
         {
             get
             {
-                var segments = new List<string>();
-
-                foreach (var tuple in _tuples)
-                {
-                    var segment = String.Format("{0}{1}{2}", tuple.Key, ConnectionStringConstants.SegmentSeperator,
-                        tuple.Value);
-                    segments.Add(segment);
-                }
+                var segments = _tuples.Select(tuple => String.Format("{0}{1}{2}", tuple.Key,
+                    ConnectionStringConstants.SegmentSeperator, tuple.Value)).ToList();
 
                 var connectionString = string.Join(
                     ConnectionStringConstants.TupleSeperator.ToString(),
                     segments);
+
                 return connectionString;
             }
         }
